@@ -1,0 +1,19 @@
+{
+  "name": "smart-mess-system",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node --watch backend/src/server.js",
+    "dev:client": "cd frontend && npx vite",
+    "seed": "node backend/src/scripts/seed.js",
+    "build": "vite build --config frontend/vite.config.js",
+    "preview": "vite preview --config frontend/vite.config.js",
+    "clean": "node -e \"require('fs').rmSync('frontend/dist', { recursive: true, force: true })\"",
+    "lint": "node --check backend/src/server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
