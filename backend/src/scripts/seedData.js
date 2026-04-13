@@ -185,6 +185,8 @@ export const USER_SEED_DATA = [
   { "name": "ROHAB UPADHYAY", "roomNumber": "918", "hostel": "Shivalik BH1", "pin": "7502" },
   { "name": "ARNAV RAI", "roomNumber": "919", "hostel": "Shivalik BH1", "pin": "6824" },
 
+
+
 { "name": "RISHABH KUMAR", "roomNumber": "101", "hostel": "Aravali BH2", "pin": "5831" },
 { "name": "RAJAN PATEL", "roomNumber": "103", "hostel": "Aravali BH2", "pin": "7294" },
 { "name": "KUSHAGRA PATEL", "roomNumber": "105", "hostel": "Aravali BH2", "pin": "1847" },
@@ -219,7 +221,6 @@ export const USER_SEED_DATA = [
 { "name": "WANG RINGTEN TAMANG", "roomNumber": "212", "hostel": "Aravali BH2", "pin": "6027" },
 { "name": "AJAY PANJAL", "roomNumber": "213", "hostel": "Aravali BH2", "pin": "4178" },
 { "name": "ANSHUMAN JHA", "roomNumber": "215", "hostel": "Aravali BH2", "pin": "8893" },
-
   { "name": "FAZLA RABBY", "roomNumber": "216", "hostel": "Aravali BH2", "pin": "9184" },
   { "name": "VAIBHAV YADAV", "roomNumber": "217", "hostel": "Aravali BH2", "pin": "4721" },
   { "name": "OMKAR MANDAL", "roomNumber": "218", "hostel": "Aravali BH2", "pin": "6503" },
@@ -254,7 +255,6 @@ export const USER_SEED_DATA = [
   { "name": "ADITYA KUMAR SAH", "roomNumber": "321", "hostel": "Aravali BH2", "pin": "9941" },
   { "name": "ZIYAUL RAHMAN", "roomNumber": "322", "hostel": "Aravali BH2", "pin": "3864" },
   { "name": "MAYANK JOSHI", "roomNumber": "323", "hostel": "Aravali BH2", "pin": "7295" },
-
   { "name": "PRAVEEN SRIVASTAVA", "roomNumber": "324", "hostel": "Aravali BH2", "pin": "5823" },
   { "name": "PRANJAL KUMAR", "roomNumber": "325", "hostel": "Aravali BH2", "pin": "9176" },
   { "name": "MANAN MISHRA", "roomNumber": "326", "hostel": "Aravali BH2", "pin": "2648" },
@@ -290,8 +290,6 @@ export const USER_SEED_DATA = [
   { "name": "PRIYAM TOLANI", "roomNumber": "509", "hostel": "Aravali BH2", "pin": "4086" },
   { "name": "AYUSH KUMAR", "roomNumber": "511", "hostel": "Aravali BH2", "pin": "9953" },
   { "name": "SUDHIR MAURYA", "roomNumber": "512", "hostel": "Aravali BH2", "pin": "1239" },
-
-   
   { "name": "KAUSTAV GHOSH", "roomNumber": "513", "hostel": "Aravali BH2", "pin": "7416" },
   { "name": "NISHCHAY GOEL", "roomNumber": "514", "hostel": "Aravali BH2", "pin": "2589" },
   { "name": "NIKHIL KUMAR", "roomNumber": "515", "hostel": "Aravali BH2", "pin": "9034" },
@@ -326,7 +324,6 @@ export const USER_SEED_DATA = [
   { "name": "AAYUSH BHATT", "roomNumber": "703", "hostel": "Aravali BH2", "pin": "8894" },
   { "name": "SAHIL SHARMA", "roomNumber": "704", "hostel": "Aravali BH2", "pin": "2603" },
   { "name": "DEVWRATT", "roomNumber": "705", "hostel": "Aravali BH2", "pin": "9752" },
-
   { "name": "ANUBHAV TIWARI", "roomNumber": "706", "hostel": "Aravali BH2", "pin": "6148" },
   { "name": "ADITYA MATHUR", "roomNumber": "707", "hostel": "Aravali BH2", "pin": "3297" },
   { "name": "RONAK SINGH", "roomNumber": "708", "hostel": "Aravali BH2", "pin": "7851" },
@@ -362,8 +359,6 @@ export const USER_SEED_DATA = [
   { "name": "SIERN SOPHA", "roomNumber": "902", "hostel": "Aravali BH2", "pin": "6581" },
   { "name": "SARANSH SAPRA", "roomNumber": "903", "hostel": "Aravali BH2", "pin": "1195" },
   { "name": "PECH PHEAKDEY", "roomNumber": "904", "hostel": "Aravali BH2", "pin": "8426" },
-  
-
   { "name": "SHASHWAT BASNET", "roomNumber": "905", "hostel": "Aravali BH2", "pin": "5073" },
   { "name": "NITIN BHATTAR", "roomNumber": "906", "hostel": "Aravali BH2", "pin": "8642" },
   { "name": "VIKAS RATHORE", "roomNumber": "907", "hostel": "Aravali BH2", "pin": "2195" },

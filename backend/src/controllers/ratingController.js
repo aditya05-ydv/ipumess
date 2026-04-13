@@ -130,7 +130,18 @@ export const getItemRatings = async (req, res) => {
 
 export const getWeeklyGraphData = async (req, res) => {
     const hostel = req.auth.hostel;
-    const { startDate, endDate } = getDateRange(30);
+
+    // Get this week's Monday to Sunday dates
+    const now = new Date();
+    const todayJS = now.getDay();
+    const mondayOffset = todayJS === 0 ? 6 : todayJS - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - mondayOffset);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const startDate = getDateString(monday);
+    const endDate = getDateString(sunday);
 
     try {
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
