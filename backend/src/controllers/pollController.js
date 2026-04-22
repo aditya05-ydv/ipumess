@@ -1,8 +1,6 @@
-
 import Poll from '../models/Poll.js';
 import { emitPollUpdate } from '../sockets/index.js';
 
-// Create a new poll (users and admins can create)
 export const createPoll = async (req, res) => {
     const { question, options } = req.body;
     if (!question || !options) {
@@ -102,7 +100,6 @@ export const getCurrentPolls = async (req, res) => {
 };
 
 export const voteInPoll = async (req, res) => {
-    
     const { pollId, optionIndex } = req.body;
     if (!pollId || optionIndex === undefined) {
         return res.status(400).json({ message: 'Missing pollId or optionIndex' });
@@ -120,31 +117,23 @@ export const voteInPoll = async (req, res) => {
             return res.status(400).json({ message: 'Invalid option index' });
         }
 
-      const existingVoteIndex = poll.votedUsers.findIndex(v => v.userId.toString() === req.auth.userId.toString());  
-          
-           
-console.log('Looking for userId:', req.auth.userId);
-console.log('votedUsers in DB:', poll.votedUsers);
-console.log('existingVoteIndex:', existingVoteIndex);
-        
+        const existingVoteIndex = poll.votedUsers.findIndex(v => v.userId.toString() === req.auth.userId.toString());
+
         if (existingVoteIndex !== -1) {
-    const previousOptionIndex = poll.votedUsers[existingVoteIndex].optionIndex;
-
-    // If no optionIndex stored (old votes), just update
-    if (previousOptionIndex !== undefined) {
-        if (previousOptionIndex === optionIndex) {
-            return res.status(409).json({ message: 'You already voted for this option.' });
+            const previousOptionIndex = poll.votedUsers[existingVoteIndex].optionIndex;
+            if (previousOptionIndex !== undefined) {
+                if (previousOptionIndex === optionIndex) {
+                    return res.status(409).json({ message: 'You already voted for this option.' });
+                }
+                poll.options[previousOptionIndex].votes -= 1;
+            }
+            poll.options[optionIndex].votes += 1;
+            poll.votedUsers[existingVoteIndex].optionIndex = optionIndex;
+            poll.votedUsers[existingVoteIndex].votedAt = new Date();
+        } else {
+            poll.options[optionIndex].votes += 1;
+            poll.votedUsers.push({ userId: req.auth.userId, optionIndex, votedAt: new Date() });
         }
-        poll.options[previousOptionIndex].votes -= 1;
-    }
-
-    poll.options[optionIndex].votes += 1;
-    poll.votedUsers[existingVoteIndex].optionIndex = optionIndex;
-    poll.votedUsers[existingVoteIndex].votedAt = new Date();
-} else {
-    poll.options[optionIndex].votes += 1;
-    poll.votedUsers.push({ userId: req.auth.userId, optionIndex, votedAt: new Date() });
-}
 
         await poll.save();
 
@@ -234,10 +223,6 @@ export const deletePoll = async (req, res) => {
     try {
         const poll = await Poll.findOne({ _id: pollId, hostel: req.auth.hostel });
         if (!poll) return res.status(404).json({ message: 'Poll not found' });
-
-        if (poll.type === 'user') {
-            return res.status(403).json({ message: 'Admin cannot delete user polls. They auto-delete after 24h.' });
-        }
 
         await Poll.deleteOne({ _id: pollId, hostel: req.auth.hostel });
         return res.status(200).json({ message: 'Poll deleted successfully' });

@@ -7,13 +7,17 @@ import authRoutes from './routes/authRoutes.js';
 import menuRoutes from './routes/menuRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js';
 import pollRoutes from './routes/pollRoutes.js';
-// FASTING REGISTER FEATURE - import (remove this line to delete feature)
 import fastingRoutes from './routes/fastingRoutes.js';
-
+import suggestionRoutes from './routes/suggestionRoutes.js'; // ADD
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
@@ -24,7 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/poll', pollRoutes);
-// FASTING REGISTER FEATURE - route (remove this line to delete feature)
 app.use('/api/fasting', fastingRoutes);
+app.use('/api/suggestions', suggestionRoutes); // ADD
 
 export default app;

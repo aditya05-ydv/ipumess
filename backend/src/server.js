@@ -5,6 +5,7 @@ import { initSocket } from './sockets/index.js';
 import { startRatingResetJob } from './jobs/ratingResetJob.js';
 // CLEANUP JOB - remove this line to delete feature
 import { startCleanupJob } from './jobs/cleanupJob.js';
+import suggestionRoutes from './routes/suggestionRoutes.js';
 
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {

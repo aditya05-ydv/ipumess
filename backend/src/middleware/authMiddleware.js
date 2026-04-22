@@ -34,3 +34,5 @@ export const requireRole = (roles) => {
     return next();
   };
 };
+
+export const protect = requireAuth;

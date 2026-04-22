@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { ChevronLeft, CheckCircle2, BarChart3, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -6,79 +5,77 @@ export const UserProfile = ({ onBack, onAdminSwitch }) => {
   const { user, logout } = useAuth();
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12">
+    <div style={{ maxWidth: '672px', margin: '0 auto', padding: '48px 24px', backgroundColor: '#f8fafc' }}>
+
       {/* Back Button */}
-      <div className="flex justify-start mb-8">
+      <div style={{ marginBottom: '32px' }}>
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-slate-400 font-semibold hover:text-blue-400 transition-all"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}
         >
           <ChevronLeft size={20} /> Back
         </button>
       </div>
 
       {/* Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#0f1623] border border-slate-700/50 p-10 rounded-3xl text-center shadow-2xl"
-      >
+      <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', padding: '40px', borderRadius: '14px', textAlign: 'center' }}>
+
         {/* Avatar */}
-        <div className="relative inline-block mb-8">
-          <div className="w-32 h-32 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-4xl font-black shadow-lg">
+        <div style={{ position: 'relative', display: 'inline-block', marginBottom: '32px' }}>
+          <div style={{ width: '128px', height: '128px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb', fontSize: '36px', fontWeight: '900' }}>
             {(user?.name || 'U').split(' ').map((part) => part[0]).slice(0, 2).join('')}
           </div>
-          <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-500 border-4 border-[#0f1623] rounded-full flex items-center justify-center text-white">
-            <CheckCircle2 size={18} />
+          <div style={{ position: 'absolute', bottom: '-8px', right: '-8px', width: '36px', height: '36px', backgroundColor: '#f97316', border: '4px solid white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+            <CheckCircle2 size={16} />
           </div>
         </div>
 
         {/* Name & Role */}
-        <h2 className="text-3xl font-black text-white mb-1">
+        <h2 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px' }}>
           {user?.name || 'Student'}
         </h2>
-        <p className="text-slate-400 font-medium mb-8">
+        <p style={{ color: '#64748b', fontWeight: '500', margin: '0 0 32px' }}>
           {user?.role === 'admin' ? 'Hostel Admin' : 'Hostel Resident • Active User'}
         </p>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-10">
-          <div className="bg-slate-800/60 border border-slate-700/40 p-6 rounded-2xl">
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
+          <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '20px', borderRadius: '10px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
               Room No
             </p>
-            <p className="text-xl font-black text-white">
+            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0' }}>
               {user?.roomNumber || 'Admin'}
             </p>
           </div>
-          <div className="bg-slate-800/60 border border-slate-700/40 p-6 rounded-2xl">
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">
+          <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '20px', borderRadius: '10px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
               Hostel
             </p>
-            <p className="text-xl font-black text-white">
+            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0' }}>
               {user?.hostel || 'Unknown'}
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-4">
-          
-            <button
-              onClick={onAdminSwitch}
-              className="w-full py-4 rounded-2xl bg-blue-600/10 border border-blue-500/30 text-blue-400 font-bold hover:bg-blue-600/20 hover:border-blue-400 transition-all flex items-center justify-center gap-3"
-            >
-              <BarChart3 size={20} /> Go to Admin Portal
-            </button>
-         
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <button
+            onClick={onAdminSwitch}
+            style={{ width: '100%', padding: '14px', borderRadius: '10px', backgroundColor: '#2563eb', border: 'none', color: '#ffffff', fontWeight: '700', fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+          >
+            <BarChart3 size={19} /> Go to Admin Portal
+          </button>
+
           <button
             onClick={logout}
-            className="w-full py-4 rounded-2xl bg-slate-800/60 border border-slate-700/40 text-slate-400 font-bold hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-400 transition-all flex items-center justify-center gap-3"
+            style={{ width: '100%', padding: '14px', borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', color: '#64748b', fontWeight: '700', fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
           >
-            <LogOut size={20} /> Logout
+            <LogOut size={19} /> Logout
           </button>
         </div>
-      </motion.div>
+
+      </div>
     </div>
   );
 };

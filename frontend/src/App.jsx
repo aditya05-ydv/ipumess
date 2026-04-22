@@ -1,9 +1,7 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
-import { HOSTELS } from './data/menuData';
 import { Sidebar } from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
 import { HostelSlider } from './components/home/HostelSlider';
@@ -16,156 +14,162 @@ import { AboutPage } from './pages/AboutPage';
 import { UserProfile } from './pages/UserProfile';
 import { LoginPage } from './pages/LoginPage';
 import ResultsPage from './pages/ResultsPage';
+import SuggestionPage from './pages/SuggestionPage';
+import { HOSTELS } from './data/menuData';
 
 const AppContent = () => {
-  const [view, setView] = useState('home');
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [pendingRating, setPendingRating] = useState(null);
-  const [loginReturn, setLoginReturn] = useState(null);
-  const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.hostelId) {
-      setSelectedHostel(user.hostelId);
-    }
+    if (user?.hostelId) setSelectedHostel(user.hostelId);
     if (user?.role === 'admin' && showAdminLogin) {
       setShowAdminLogin(false);
-      setView('admin');
+      navigate('/admin');
     }
   }, [user?.hostelId, user?.role, showAdminLogin]);
 
+  const requireAuth = (path) => {
+    if (!user) {
+      navigate('/login', { state: { returnTo: path } });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNavigate = (view) => {
+    if (view === 'home') { navigate('/'); return; }
+    if (view === 'menu') {
+      setSelectedHostel(user?.hostelId || selectedHostel || 'bh1');
+      navigate('/menu'); return;
+    }
+    if (view === 'admin') { setShowAdminLogin(true); return; }
+    if (['polls', 'results', 'suggestions', 'profile'].includes(view)) {
+      if (!requireAuth('/' + view)) return;
+    }
+    navigate('/' + view);
+  };
+
   const handleEnterPortal = () => {
     setSelectedHostel(user?.hostelId || selectedHostel || 'bh1');
-    setView('menu');
+    navigate('/menu');
   };
 
-  const handleMenuClick = () => {
-    setSelectedHostel(user?.hostelId || selectedHostel || 'bh1');
-    setView('menu');
-  };
+  const showFooter = location.pathname !== '/' && location.pathname !== '/login';
 
-  const handleDayClick = (day) => {
-    setSelectedDay(day);
-  };
+  return (
+    <div className="min-h-screen bg-[#f8fafc]">
+      <Sidebar
+        currentView={location.pathname.replace('/', '') || 'home'}
+        onNavigate={handleNavigate}
+        onSignIn={() => navigate('/login', { state: { returnTo: location.pathname } })}
+      />
 
-  const resetToHome = () => {
-    setView('home');
-    setSelectedHostel(null);
-    setSelectedDay(null);
-    setShowAdminLogin(false);
-    setLoginReturn(null);
-    setPendingRating(null);
-  };
+      {/* 
+        Mobile:  only top padding (57px for topbar), no left padding
+        Desktop: top padding + left padding for sidebar (240px = w-60)
+      */}
+      <main className="pt-[57px] lg:pl-[240px]">
+        <Routes>
+          <Route path="/" element={<HostelSlider onEnterPortal={handleEnterPortal} />} />
 
-  const openLoginPage = (returnState = null) => {
-    setLoginReturn(returnState);
-    setView('login');
-  };
+          <Route path="/about" element={<AboutPage onBack={() => navigate('/')} />} />
 
-  const guardedSetView = (nextView) => {
-    if ((nextView === 'polls' || nextView === 'results' || nextView === 'profile') && !user) {
-      openLoginPage({ returnView: nextView });
-      return;
-    }
-    if (nextView === 'admin') {
-      setShowAdminLogin(true);
-      return;
-    }
-    setView(nextView);
-  };
+          <Route path="/menu" element={
+            <MenuTable
+              hostelId={selectedHostel || user?.hostelId || 'bh1'}
+              onDayClick={(day) => setSelectedDay(day)}
+              onSelectHostel={setSelectedHostel}
+              onSignInClick={() => navigate('/login', { state: { returnTo: '/menu' } })}
+            />
+          } />
 
-  const handleRequireLoginForRating = (ratingPayload) => {
-    setPendingRating(ratingPayload);
-    openLoginPage({
-      returnView: 'menu',
-      day: selectedDay,
-      hostelId: selectedHostel,
-    });
-    setSelectedDay(null);
-  };
+          <Route path="/polls" element={
+            user
+              ? <Polls onVote={() => navigate('/login', { state: { returnTo: '/polls' } })} onBack={() => navigate('/menu')} />
+              : <LoginPage onBack={() => navigate('/')} onSuccess={() => navigate('/polls')} initialHostel={selectedHostel || 'bh1'} />
+          } />
 
-  const handleLoginSuccess = () => {
-    if (loginReturn?.hostelId && loginReturn?.day) {
-      setSelectedHostel(loginReturn.hostelId);
-      setSelectedDay(loginReturn.day);
-      setView('menu');
-      setLoginReturn(null);
-      return;
-    }
+          <Route path="/results" element={
+            user ? <ResultsPage /> : <LoginPage onBack={() => navigate('/')} onSuccess={() => navigate('/results')} initialHostel={selectedHostel || 'bh1'} />
+          } />
 
-    setView(loginReturn?.returnView || 'menu');
-    setLoginReturn(null);
-  };
+          <Route path="/suggestions" element={
+            user ? <SuggestionPage /> : <LoginPage onBack={() => navigate('/')} onSuccess={() => navigate('/suggestions')} initialHostel={selectedHostel || 'bh1'} />
+          } />
 
-  const currentHostel = HOSTELS.find((hostel) => hostel.id === selectedHostel);
-  const showFooter = view !== 'home' && view !== 'login' && !(!selectedHostel && view === 'menu');
+          <Route path="/profile" element={
+            user
+              ? <UserProfile onBack={() => navigate('/menu')} onAdminSwitch={() => setShowAdminLogin(true)} />
+              : <LoginPage onBack={() => navigate('/')} onSuccess={() => navigate('/profile')} initialHostel={selectedHostel || 'bh1'} />
+          } />
 
-  return _jsxs('div', {
-   className: 'min-h-screen selection:bg-blue-900 selection:text-blue-300',
-style: { backgroundColor: '#0A0F1E' },
-    children: [
-      _jsx(Sidebar, {
-        currentView: view,
-        onNavigate: (nextView) => {
-          if (nextView === 'home') {
-            resetToHome();
-          } else if (nextView === 'menu') {
-            setSelectedHostel(user?.hostelId || selectedHostel || 'bh1');
-            guardedSetView('menu');
-          } else {
-            guardedSetView(nextView);
-          }
-        },
-        onSignIn: () => openLoginPage({ returnView: view || 'menu' }),
-      }),
-      _jsx('main', {
-        className: 'pt-20 lg:pt-20 lg:pl-64',
-        children: _jsxs(AnimatePresence, {
-          mode: 'wait',
-          children: [
-            view === 'home' && _jsx(motion.div, { exit: { opacity: 0 }, children: _jsx(HostelSlider, { onEnterPortal: handleEnterPortal }) }, 'home'),
-            view === 'about' && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, children: _jsx(AboutPage, { onBack: resetToHome }) }, 'about'),
-            view === 'menu' && _jsx(motion.div, { initial: { opacity: 0, x: 20 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -20 }, children: _jsx(MenuTable, { hostelId: selectedHostel || 'bh1', onDayClick: handleDayClick, onSelectHostel: setSelectedHostel, onSignInClick: () => openLoginPage({ returnView: 'menu' }) }) }, 'menu-view'),
-            view === 'polls' && user && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, children: _jsx(Polls, { onVote: () => openLoginPage({ returnView: 'polls' }), onBack: () => setView('menu') }) }, 'polls'),
-            view === 'results' && user && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, children: _jsx(ResultsPage, {}) }, 'results'),
-            view === 'profile' && user && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, children: _jsx(UserProfile, { onBack: () => setView('menu'), onAdminSwitch: () => setShowAdminLogin(true) }) }, 'profile'),
-            view === 'admin' && user?.role === 'admin' && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, children: _jsx(AdminPortal, { onBack: () => setView('profile') }) }, 'admin'),
-            view === 'login' && _jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, children: _jsx(LoginPage, {
-              onBack: () => {
-                if (loginReturn?.hostelId && loginReturn?.day) {
-                  setSelectedHostel(loginReturn.hostelId);
-                  setSelectedDay(loginReturn.day);
-                  setView('menu');
-                } else {
-                  setView('home');
-                }
-              },
-              onSuccess: handleLoginSuccess,
-              initialHostel: loginReturn?.hostelId || selectedHostel || 'bh1'
-            }) }, 'login'),
-          ]
-        })
-      }),
-      _jsxs(AnimatePresence, {
-        children: [
-          selectedDay && _jsx(DayDetail, {
-            dayMenu: selectedDay,
-            hostelId: selectedHostel || user?.hostelId || 'bh1',
-            onClose: () => setSelectedDay(null),
-            onRequireLogin: handleRequireLoginForRating,
-            pendingRating: pendingRating,
-            onPendingRatingHandled: () => setPendingRating(null)
-          }),
-          showAdminLogin && _jsx(LoginModal, { onClose: () => setShowAdminLogin(false), mode: 'admin' })
-        ]
-      }),
-      _jsx(Footer, { show: showFooter, onNavigate: guardedSetView })
-    ]
-  });
+          <Route path="/admin" element={
+            user?.role === 'admin'
+              ? <AdminPortal onBack={() => navigate('/profile', { replace: true })} />
+              : <LoginPage onBack={() => navigate('/')} onSuccess={() => navigate('/admin')} initialHostel={selectedHostel || 'bh1'} />
+          } />
+
+          <Route path="/login" element={
+            <LoginPage
+              onBack={() => navigate(location.state?.returnTo || '/')}
+              onSuccess={() => navigate(location.state?.returnTo || '/menu')}
+              initialHostel={selectedHostel || 'bh1'}
+            />
+          } />
+
+          <Route path="*" element={
+            <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+              <p className="text-6xl font-black text-[#e2e8f0] mb-4">404</p>
+              <h2 className="text-xl font-bold text-[#0f172a] mb-2">Page not found</h2>
+              <p className="text-sm text-[#64748b] mb-6">The page you're looking for doesn't exist.</p>
+              <button
+                onClick={() => navigate('/')}
+                className="px-6 py-2.5 rounded-lg bg-[#2563eb] text-white text-sm font-semibold hover:bg-[#1d4ed8]"
+              >
+                Go Home
+              </button>
+            </div>
+          } />
+        </Routes>
+      </main>
+
+      {selectedDay && (
+        <DayDetail
+          dayMenu={selectedDay}
+          hostelId={selectedHostel || user?.hostelId || 'bh1'}
+          onClose={() => setSelectedDay(null)}
+          onRequireLogin={(payload) => {
+            setPendingRating(payload);
+            navigate('/login', { state: { returnTo: '/menu' } });
+            setSelectedDay(null);
+          }}
+          pendingRating={pendingRating}
+          onPendingRatingHandled={() => setPendingRating(null)}
+        />
+      )}
+
+      {showAdminLogin && (
+        <LoginModal onClose={() => setShowAdminLogin(false)} mode="admin" />
+      )}
+
+      <Footer show={showFooter} onNavigate={handleNavigate} />
+    </div>
+  );
 };
 
 export default function App() {
-  return _jsx(AuthProvider, { children: _jsx(SocketProvider, { children: _jsx(AppContent, {}) }) });
+  return (
+    <AuthProvider>
+      <SocketProvider>
+        <AppContent />
+      </SocketProvider>
+    </AuthProvider>
+  );
 }

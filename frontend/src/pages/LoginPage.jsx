@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
 import { ArrowLeft, KeyRound, Loader2 } from 'lucide-react';
 import { HOSTELS } from '../data/menuData';
 import { useAuth } from '../context/AuthContext';
-import { cn } from '../lib/utils';
 
 export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
   const { login, isLoading, error } = useAuth();
@@ -18,101 +16,65 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
   };
 
   return (
-    <div style={{
-      minHeight: 'calc(100vh - 80px)',
-      background: '#0d1017',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '32px 16px',
-    }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        style={{ width: '100%', maxWidth: '420px' }}
-      >
+    <div className="min-h-[calc(100vh-80px)] bg-[#f8fafc] flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-sm">
+
         {/* Back */}
-        <motion.button
+        <button
           onClick={onBack}
-          whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            marginBottom: '24px', padding: '8px 16px', borderRadius: '10px',
-            border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)',
-            color: '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
-            fontFamily: '"DM Sans", sans-serif',
-          }}
+          className="inline-flex items-center gap-1.5 mb-6 px-4 py-2 rounded-xl border border-[#e2e8f0] bg-white text-[#64748b] text-sm font-semibold cursor-pointer hover:border-[#bfdbfe] hover:text-[#2563eb] transition-colors"
         >
           <ArrowLeft size={15} /> Back
-        </motion.button>
+        </button>
 
         {/* Card */}
-        <div style={{
-          borderRadius: '16px', overflow: 'hidden',
-          border: '1px solid rgba(99,102,241,0.2)',
-          background: 'linear-gradient(160deg, #161b27 0%, #111520 100%)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
-        }}>
-          {/* Top accent */}
-          <div style={{ height: '3px', background: 'linear-gradient(90deg, #4f46e5 0%, #a78bfa 50%, #6366f1 100%)' }} />
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white overflow-hidden">
+          <div className="h-0.5 bg-[#2563eb]" />
 
-          <div style={{ padding: '32px 28px' }}>
+          <div className="p-7">
             {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <div style={{
-                width: '48px', height: '48px', borderRadius: '12px', margin: '0 auto 14px',
-                background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <KeyRound size={20} color="#818cf8" />
+            <div className="text-center mb-7">
+              <div className="w-12 h-12 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center mx-auto mb-3">
+                <KeyRound size={20} color="#2563eb" />
               </div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', fontFamily: '"DM Sans", sans-serif', letterSpacing: '-0.02em', marginBottom: '6px' }}>
+              <h2 className="text-xl font-extrabold text-[#0f172a] tracking-tight mb-1">
                 Enter to Rate
               </h2>
-              <p style={{ fontSize: '12px', color: '#4b5563', fontFamily: '"DM Mono", monospace', letterSpacing: '0.06em' }}>
+              <p className="text-xs text-[#94a3b8] tracking-wider">
                 Hostel · Room Number · Access Code
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
               {/* Error */}
               {error && (
-                <div style={{
-                  borderRadius: '9px', padding: '12px 14px',
-                  background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)',
-                  fontSize: '13px', fontWeight: 600, color: '#fca5a5',
-                  fontFamily: '"DM Sans", sans-serif',
-                }}>
+                <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm font-semibold text-[#dc2626]">
                   {error}
                 </div>
               )}
 
               {/* Hostel selector */}
               <div>
-                <label style={{ display: 'block', marginBottom: '10px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4b5563', fontFamily: '"DM Mono", monospace' }}>
+                <label className="block mb-2.5 text-[10px] font-bold tracking-widest uppercase text-[#94a3b8]">
                   Hostel
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div className="grid grid-cols-2 gap-2">
                   {HOSTELS.map((hostel) => {
                     const isActive = formData.hostel === hostel.id;
                     return (
-                      <motion.button
+                      <button
                         key={hostel.id}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, hostel: hostel.id }))}
-                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                        style={{
-                          padding: '10px 12px', borderRadius: '9px', textAlign: 'left',
-                          cursor: 'pointer', transition: 'all 0.15s ease',
-                          border: isActive ? '1px solid rgba(99,102,241,0.5)' : '1px solid rgba(255,255,255,0.07)',
-                          background: isActive ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)',
-                          color: isActive ? '#a5b4fc' : '#94a3b8',
-                          fontSize: '13px', fontWeight: 700, fontFamily: '"DM Sans", sans-serif',
-                          boxShadow: isActive ? '0 0 0 1px rgba(99,102,241,0.2)' : 'none',
-                        }}
+                        className={`px-3 py-2.5 rounded-xl text-left text-sm font-bold cursor-pointer border transition-colors
+                          ${isActive
+                            ? 'border-[#2563eb] bg-[#eff6ff] text-[#2563eb]'
+                            : 'border-[#e2e8f0] bg-white text-[#64748b] hover:border-[#bfdbfe]'
+                          }`}
                       >
                         {hostel.name.split(' ')[0]}
-                      </motion.button>
+                      </button>
                     );
                   })}
                 </div>
@@ -120,7 +82,7 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
 
               {/* Room Number */}
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4b5563', fontFamily: '"DM Mono", monospace' }}>
+                <label className="block mb-2 text-[10px] font-bold tracking-widest uppercase text-[#94a3b8]">
                   Room Number
                 </label>
                 <input
@@ -129,23 +91,13 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
                   value={formData.roomNumber}
                   onChange={e => setFormData(prev => ({ ...prev, roomNumber: e.target.value }))}
                   placeholder="e.g. 302"
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    padding: '11px 14px', borderRadius: '9px',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    background: 'rgba(255,255,255,0.03)',
-                    color: '#e2e8f0', fontSize: '14px',
-                    fontFamily: '"DM Sans", sans-serif',
-                    outline: 'none', transition: 'border-color 0.15s ease',
-                  }}
-                  onFocus={e => e.target.style.borderColor = 'rgba(99,102,241,0.5)'}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.07)'}
+                  className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb] transition-colors"
                 />
               </div>
 
               {/* PIN */}
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4b5563', fontFamily: '"DM Mono", monospace' }}>
+                <label className="block mb-2 text-[10px] font-bold tracking-widest uppercase text-[#94a3b8]">
                   Access Code (PIN)
                 </label>
                 <input
@@ -155,45 +107,28 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
                   value={formData.pin}
                   onChange={e => setFormData(prev => ({ ...prev, pin: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
                   placeholder="••••"
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    padding: '11px 14px', borderRadius: '9px',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    background: 'rgba(255,255,255,0.03)',
-                    color: '#e2e8f0', fontSize: '18px', letterSpacing: '0.3em',
-                    fontFamily: '"DM Mono", monospace',
-                    outline: 'none', transition: 'border-color 0.15s ease',
-                  }}
-                  onFocus={e => e.target.style.borderColor = 'rgba(99,102,241,0.5)'}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.07)'}
+                  className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-lg tracking-[0.3em] outline-none focus:border-[#2563eb] transition-colors"
                 />
               </div>
 
               {/* Submit */}
-              <motion.button
+              <button
                 type="submit"
                 disabled={isLoading}
-                whileHover={!isLoading ? { scale: 1.01 } : {}}
-                whileTap={!isLoading ? { scale: 0.98 } : {}}
-                style={{
-                  marginTop: '4px',
-                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  padding: '13px', borderRadius: '10px',
-                  background: isLoading ? 'rgba(99,102,241,0.4)' : 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
-                  border: '1px solid rgba(99,102,241,0.4)',
-                  color: '#fff', fontSize: '14px', fontWeight: 700,
-                  fontFamily: '"DM Sans", sans-serif', cursor: isLoading ? 'not-allowed' : 'pointer',
-                  boxShadow: isLoading ? 'none' : '0 4px 16px rgba(99,102,241,0.35)',
-                  transition: 'all 0.2s ease',
-                }}
+                className={`mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[#2563eb] text-white text-sm font-bold transition-colors cursor-pointer
+                  ${isLoading ? 'bg-[#93c5fd] cursor-not-allowed' : 'bg-[#2563eb] hover:bg-[#1d4ed8]'}`}
               >
-                {isLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : 'Continue →'}
-              </motion.button>
+                {isLoading
+                  ? <Loader2 size={16} className="animate-spin" />
+                  : 'Continue →'
+                }
+              </button>
 
             </form>
           </div>
         </div>
-      </motion.div>
+
+      </div>
     </div>
   );
 };

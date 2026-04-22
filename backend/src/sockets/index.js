@@ -6,8 +6,9 @@ let io;
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: '*', // For development
-            methods: ['GET', 'POST', 'PUT']
+            origin: '*',
+            credentials: true,
+            methods: ['GET', 'POST', 'PUT', 'DELETE']
         }
     });
     io.on('connection', (socket) => {

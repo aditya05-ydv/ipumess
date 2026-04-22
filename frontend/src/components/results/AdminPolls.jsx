@@ -15,37 +15,36 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
 
   return (
     <div style={{
-      borderRadius: '14px',
-      border: '1px solid rgba(255,255,255,0.07)',
-      background: 'linear-gradient(135deg, #161b27 0%, #111520 100%)',
+      borderRadius: '12px',
+      border: '1px solid #e2e8f0',
+      background: '#ffffff',
       overflow: 'hidden',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
       margin: '16px 0',
     }}>
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '16px 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        background: 'rgba(244,63,94,0.05)',
+        borderBottom: '1px solid #e2e8f0',
+        background: '#f8fafc',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '8px',
-            background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.25)',
+            background: '#eff6ff', border: '1px solid #bfdbfe',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <ClipboardList size={15} color="#fb7185" />
+            <ClipboardList size={15} color="#2563eb" />
           </div>
-          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', fontFamily: '"DM Sans", sans-serif' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
             Admin Polls & Questions
           </h3>
         </div>
         <div style={{
           padding: '3px 10px', borderRadius: '20px',
-          background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)',
-          fontSize: '10px', fontWeight: 700, color: '#fb7185',
-          fontFamily: '"DM Mono", monospace', letterSpacing: '0.1em', textTransform: 'uppercase',
+          background: '#eff6ff', border: '1px solid #bfdbfe',
+          fontSize: '10px', fontWeight: 700, color: '#2563eb',
+          letterSpacing: '0.08em', textTransform: 'uppercase',
         }}>
           {empty ? 0 : polls.length} active
         </div>
@@ -55,8 +54,8 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
       {empty ? (
         <div style={{
           padding: '40px 20px', textAlign: 'center',
-          fontSize: '11px', color: '#374151',
-          fontFamily: '"DM Mono", monospace', letterSpacing: '0.12em', textTransform: 'uppercase',
+          fontSize: '12px', color: '#94a3b8',
+          letterSpacing: '0.1em', textTransform: 'uppercase',
         }}>
           No active admin polls at the moment.
         </div>
@@ -74,10 +73,9 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                 key={poll._id}
                 style={{
                   borderRadius: '10px',
-                  border: isExpanded ? '1px solid rgba(244,63,94,0.2)' : '1px solid rgba(255,255,255,0.06)',
-                  background: isExpanded ? 'rgba(244,63,94,0.04)' : 'rgba(255,255,255,0.02)',
+                  border: isExpanded ? '1px solid #bfdbfe' : '1px solid #e2e8f0',
+                  background: isExpanded ? '#eff6ff' : '#ffffff',
                   overflow: 'hidden',
-                  transition: 'border-color 0.2s ease',
                 }}
               >
                 {/* Poll row */}
@@ -91,17 +89,15 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1, minWidth: 0 }}>
                     <div style={{
                       width: '24px', height: '24px', borderRadius: '6px', flexShrink: 0,
-                      background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)',
+                      background: '#eff6ff', border: '1px solid #bfdbfe',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '10px', fontWeight: 700, color: '#c4b5fd',
-                      fontFamily: '"DM Mono", monospace',
+                      fontSize: '10px', fontWeight: 700, color: '#2563eb',
                     }}>
                       {pollIdx + 1}
                     </div>
                     <span style={{
-                      fontSize: '13px', fontWeight: 600, color: '#cbd5e1',
-                      fontFamily: '"DM Sans", sans-serif', lineHeight: 1.4,
-                      wordBreak: 'break-word',
+                      fontSize: '13px', fontWeight: 600, color: '#0f172a',
+                      lineHeight: 1.4, wordBreak: 'break-word',
                     }}>
                       {poll.question}
                     </span>
@@ -110,17 +106,16 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                     <div style={{
                       padding: '3px 8px', borderRadius: '6px',
-                      background: isExpired ? 'rgba(107,114,128,0.15)' : 'rgba(52,211,153,0.1)',
-                      border: isExpired ? '1px solid rgba(107,114,128,0.2)' : '1px solid rgba(52,211,153,0.2)',
-                      fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                      color: isExpired ? '#6b7280' : '#34d399',
-                      fontFamily: '"DM Mono", monospace',
+                      background: isExpired ? '#f1f5f9' : '#f0fdf4',
+                      border: isExpired ? '1px solid #e2e8f0' : '1px solid #bbf7d0',
+                      fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                      color: isExpired ? '#94a3b8' : '#16a34a',
                     }}>
                       {isExpired ? 'Expired' : 'Active'}
                     </div>
                     {isExpanded
-                      ? <ChevronDown size={14} color="#4b5563" />
-                      : <ChevronRight size={14} color="#4b5563" />
+                      ? <ChevronDown size={14} color="#94a3b8" />
+                      : <ChevronRight size={14} color="#94a3b8" />
                     }
                   </div>
                 </div>
@@ -128,8 +123,8 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                 {/* Expanded content */}
                 {isExpanded && (
                   <div style={{
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                    background: 'rgba(0,0,0,0.2)',
+                    borderTop: '1px solid #e2e8f0',
+                    background: '#ffffff',
                     padding: '14px',
                   }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginBottom: '12px' }}>
@@ -147,41 +142,36 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                               position: 'relative', overflow: 'hidden',
                               width: '100%', textAlign: 'left',
                               padding: '10px 14px', borderRadius: '8px',
-                              border: isSelected
-                                ? '1px solid rgba(244,63,94,0.45)'
-                                : '1px solid rgba(255,255,255,0.06)',
-                              background: isSelected
-                                ? 'rgba(244,63,94,0.1)'
-                                : 'rgba(255,255,255,0.03)',
+                              border: isSelected ? '1px solid #2563eb' : '1px solid #e2e8f0',
+                              background: isSelected ? '#eff6ff' : '#f8fafc',
                               cursor: disabled ? 'not-allowed' : 'pointer',
                               opacity: disabled && !isSelected ? 0.6 : 1,
-                              transition: 'all 0.15s ease',
-                              boxShadow: isSelected ? '0 0 12px rgba(244,63,94,0.15)' : 'none',
                             }}
                           >
                             {/* Progress fill */}
                             <div style={{
                               position: 'absolute', top: 0, left: 0, height: '100%',
                               width: `${pct}%`,
-                              background: isSelected ? 'rgba(244,63,94,0.08)' : 'rgba(255,255,255,0.03)',
-                              transition: 'width 0.7s ease',
+                              background: isSelected ? '#dbeafe' : '#f1f5f9',
+                              borderRight: pct > 0 ? '2px solid #bfdbfe' : 'none',
                             }} />
 
                             <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                              <span style={{ fontSize: '13px', fontWeight: 600, color: isSelected ? '#fda4af' : '#94a3b8', fontFamily: '"DM Sans", sans-serif', wordBreak: 'break-word', flex: 1 }}>
+                              <span style={{
+                                fontSize: '13px', fontWeight: 600,
+                                color: isSelected ? '#1d4ed8' : '#0f172a',
+                                wordBreak: 'break-word', flex: 1,
+                              }}>
                                 {option.text}
                               </span>
-                              <div style={{
-                                display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
-                              }}>
-                                <span style={{ fontSize: '10px', fontWeight: 700, color: '#6366f1', fontFamily: '"DM Mono", monospace' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                <span style={{ fontSize: '10px', fontWeight: 700, color: '#2563eb' }}>
                                   {pct}%
                                 </span>
                                 <span style={{
                                   padding: '2px 7px', borderRadius: '5px',
-                                  background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
-                                  fontSize: '10px', fontWeight: 700, color: '#818cf8',
-                                  fontFamily: '"DM Mono", monospace',
+                                  background: '#eff6ff', border: '1px solid #bfdbfe',
+                                  fontSize: '10px', fontWeight: 700, color: '#2563eb',
                                 }}>
                                   {option.votes}
                                 </span>
@@ -195,26 +185,26 @@ const AdminPolls = ({ polls, onVote, isLoading }) => {
                     {/* Footer */}
                     <div style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px',
+                      borderTop: '1px solid #e2e8f0', paddingTop: '10px',
                       flexWrap: 'wrap', gap: '6px',
                     }}>
-                      <span style={{ fontSize: '10px', color: '#374151', fontFamily: '"DM Mono", monospace' }}>
+                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>
                         {totalVotes} vote{totalVotes !== 1 ? 's' : ''} total
                       </span>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         {hasVoted && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <CheckCircle2 size={12} color="#34d399" />
-                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#34d399', fontFamily: '"DM Mono", monospace' }}>
+                            <CheckCircle2 size={12} color="#16a34a" />
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a' }}>
                               Voted
                             </span>
                           </div>
                         )}
                         {!isExpired && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Clock size={11} color="#fbbf24" />
-                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#fbbf24', fontFamily: '"DM Mono", monospace' }}>
+                            <Clock size={11} color="#d97706" />
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: '#d97706' }}>
                               {timeRemaining.hours}h {timeRemaining.minutes}m
                             </span>
                           </div>

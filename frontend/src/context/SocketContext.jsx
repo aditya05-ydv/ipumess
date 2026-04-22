@@ -10,15 +10,22 @@ export const SocketProvider = ({ children }) => {
   const { token, user } = useAuth();
 
   useEffect(() => {
+    if (!token || !user?.hostel) {
+      return;
+    }
+
     const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
-    const newSocket = io(socketUrl);
+    const newSocket = io(socketUrl, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5
+    });
 
     newSocket.on('connect', () => {
       setIsConnected(true);
       console.log('Socket connected:', newSocket.id);
-      if (token && user?.hostel) {
-        newSocket.emit('joinHostel', { token });
-      }
+      newSocket.emit('joinHostel', { token });
     });
 
     newSocket.on('disconnect', () => {

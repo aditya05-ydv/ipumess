@@ -25,6 +25,7 @@ export const login = async (req, res) => {
             userId: user._id.toString(),
             hostel: user.hostel,
             roomNumber: user.roomNumber,
+            name: user.name, // change by antigracity — added so req.auth.name is available in suggestionController
         });
         // Return user info on success
         return res.status(200).json({

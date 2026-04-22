@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { ArrowRight, Users, Star, TrendingUp, Shield, Clock, Bell } from 'lucide-react';
 
 export const HostelSlider = ({ onEnterPortal }) => {
@@ -16,158 +15,73 @@ export const HostelSlider = ({ onEnterPortal }) => {
   ];
 
   return (
-    <section
-      className="min-h-screen flex items-center justify-center px-6 py-20"
-      style={{ backgroundColor: '#0A0F1E' }}
-    >
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(#3B82F6 1px, transparent 1px), linear-gradient(90deg, #3B82F6 1px, transparent 1px)`,
-          backgroundSize: '80px 80px'
-        }}
-      />
+    <section style={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px' }}>
+      <div style={{ width: '100%', maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="w-full max-w-2xl mx-auto text-center"
-      >
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="flex justify-center mb-6"
-        >
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider"
-            style={{
-              backgroundColor: 'rgba(59,130,246,0.08)',
-              border: '1px solid rgba(59,130,246,0.25)',
-              color: '#60A5FA'
-            }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse flex-shrink-0" />
-            Hostel Mess Management System
-          </div>
-        </motion.div>
+        
 
         {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-5"
-        >
-          <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-4"
-            style={{ color: '#F1F5F9' }}
-          >
+        <div style={{ marginBottom: '20px' }}>
+          <h1 style={{ fontSize: '52px', fontWeight: '800', lineHeight: '1.15', letterSpacing: '-1.5px', marginBottom: '16px', color: '#0f172a' }}>
             Your Hostel Dining,{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #3B82F6, #38BDF8)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              Reimagined.
-            </span>
+            <span style={{ color: '#2563eb' }}>Reimagined.</span>
           </h1>
-          <p
-            className="text-sm sm:text-base max-w-md mx-auto leading-relaxed"
-            style={{ color: '#64748B' }}
-          >
+          <p style={{ fontSize: '16px', color: '#64748b', maxWidth: '440px', margin: '0 auto', lineHeight: '1.7' }}>
             A student-driven platform for transparent meal ratings, live polls,
             and weekly menu planning — all in one place.
           </p>
-        </motion.div>
+        </div>
 
         {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10"
-        >
-          <motion.button
-            whileHover={{ scale: 1.02, boxShadow: '0 8px 28px rgba(59,130,246,0.35)' }}
-            whileTap={{ scale: 0.98 }}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '40px', flexWrap: 'wrap' }}>
+          <button
             onClick={onEnterPortal}
-            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-white transition-all"
-            style={{ backgroundColor: '#3B82F6' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 28px', borderRadius: '10px', fontWeight: '600', fontSize: '15px', color: '#ffffff', backgroundColor: '#2563eb', border: 'none', cursor: 'pointer' }}
           >
             Enter Mess Portal
-            <ArrowRight size={18} />
-          </motion.button>
+            <ArrowRight size={17} />
+          </button>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = '/about'}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-medium text-sm transition-all"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.04)',
-              border: '1px solid #1E3A5F',
-              color: '#94A3B8'
-            }}
-          >
-            Learn More
-          </motion.button>
-        </motion.div>
+          
+        </div>
 
         {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-3 gap-3 mb-4 mx-auto"
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
           {stats.map(({ label, value, icon: Icon }) => (
             <div
               key={label}
-              className="flex flex-col items-center py-4 px-2 rounded-2xl"
-              style={{ backgroundColor: '#111827', border: '1px solid #1E3A5F' }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 12px', borderRadius: '14px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
             >
-              <Icon size={15} color="#3B82F6" className="mb-2" />
-              <p className="text-base font-black" style={{ color: '#F1F5F9' }}>{value}</p>
-              <p className="text-xs mt-0.5 text-center leading-tight" style={{ color: '#475569' }}>{label}</p>
+              <Icon size={16} color="#2563eb" style={{ marginBottom: '10px' }} />
+              <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0 0 4px' }}>{value}</p>
+              <p style={{ fontSize: '12px', color: '#64748b', margin: '0', textAlign: 'center' }}>{label}</p>
             </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Features */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 mx-auto"
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="p-4 rounded-2xl flex flex-col gap-2 text-left"
-              style={{ backgroundColor: '#0D1526', border: '1px solid #1E3A5F' }}
+              style={{ padding: '16px', borderRadius: '14px', display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
             >
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: 'rgba(59,130,246,0.1)' }}
-              >
-                <Icon size={15} color="#3B82F6" />
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eff6ff' }}>
+                <Icon size={15} color="#2563eb" />
               </div>
-              <p className="text-xs font-semibold" style={{ color: '#F1F5F9' }}>{title}</p>
-              <p className="text-xs leading-relaxed" style={{ color: '#475569' }}>{desc}</p>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', margin: '0' }}>{title}</p>
+              <p style={{ fontSize: '12px', color: '#64748b', margin: '0', lineHeight: '1.5' }}>{desc}</p>
             </div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Trust */}
-        <p className="text-center text-xs mt-6" style={{ color: '#334155' }}>
+        {/* Trust line */}
+        <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>
           ✓ Secure Login &nbsp;•&nbsp; 700+ Active Students &nbsp;•&nbsp; Real-time Feedback
         </p>
-      </motion.div>
+
+      </div>
     </section>
   );
 };

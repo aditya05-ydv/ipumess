@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Home, UtensilsCrossed, Info, LogIn, BarChart3, MessageSquare, Settings, Utensils } from 'lucide-react';
+import { Menu, X, Home, UtensilsCrossed, Info, LogIn, BarChart3, MessageSquare, Settings, Utensils, Lightbulb } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 
@@ -17,6 +16,7 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
   const userNavItems = [
     { label: 'Polls', icon: MessageSquare, view: 'polls', action: () => { onNavigate('polls'); setIsOpen(false); } },
     { label: 'Results', icon: BarChart3, view: 'results', action: () => { onNavigate('results'); setIsOpen(false); } },
+    { label: 'Suggestion', icon: Lightbulb, view: 'suggestions', action: () => { onNavigate('suggestions'); setIsOpen(false); } },
     { label: 'Profile', icon: Settings, view: 'profile', action: () => { onNavigate('profile'); setIsOpen(false); } },
   ];
 
@@ -24,117 +24,133 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
     <button
       onClick={item.action}
       className={cn(
-        'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium',
+        'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
         currentView === item.view
-          ? 'text-blue-400'
-          : 'text-slate-400 hover:text-white'
+          ? 'bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]'
+          : 'text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]'
       )}
-      style={currentView === item.view ? {
-        backgroundColor: 'rgba(59,130,246,0.12)',
-        borderLeft: '2px solid #3B82F6'
-      } : {
-        borderLeft: '2px solid transparent'
-      }}
     >
-      <item.icon size={18} />
+      <item.icon size={16} />
       <span>{item.label}</span>
     </button>
   );
 
   return (
     <div>
-      {/* Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 border-b"
-        style={{ backgroundColor: '#0D1526', borderColor: '#1E3A5F' }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      {/* ── TOPBAR ── */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-[#e2e8f0]">
+        <div className="flex items-center justify-between h-[57px]">
 
-          {/* Left — Hamburger + Logo */}
-          <div className="flex items-center gap-3">
+          {/* ── MOBILE TOPBAR (visible only < lg) ── */}
+          <div className="flex lg:hidden items-center gap-3 px-4 h-full flex-1">
+            {/* Hamburger — always visible on mobile */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg transition lg:hidden text-slate-400 hover:text-white"
-              style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+              className="p-2 rounded-lg bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] hover:text-[#0f172a] flex-shrink-0"
             >
-              {isOpen ? <X size={20} /> : <Menu size={20} />}
+              {isOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
 
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#3B82F6' }}
-              >
-                <Utensils size={16} color="white" />
+            {/* Mobile Logo */}
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-[#2563eb] flex items-center justify-center flex-shrink-0">
+                <Utensils size={13} color="white" />
               </div>
-              <div className="hidden sm:block">
-                <p className="text-white font-bold text-sm leading-tight">Smart Mess</p>
-                <p className="text-slate-500 text-xs">Student Initiative</p>
-              </div>
+              <p className="text-[#0f172a] font-bold text-sm">Smart Mess</p>
+            </div>
+
+            {/* Mobile Auth — pushed to right */}
+            <div className="ml-auto">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <p className="text-[#0f172a] text-xs font-semibold leading-tight">{user.name || 'Student'}</p>
+                    <p className="text-[#94a3b8] text-[10px]">{user.hostel || ''}</p>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#e2e8f0] bg-white text-[#64748b]"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onSignIn}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#2563eb]"
+                >
+                  <LogIn size={13} />
+                  Sign In
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Right — Auth */}
-          <div className="flex items-center gap-3">
-            {user ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:block text-right">
-                  <p className="text-white text-sm font-medium">{user.name || 'Student'}</p>
-                  <p className="text-slate-500 text-xs">{user.hostel || ''}</p>
-                </div>
-                <button
-                  onClick={logout}
-                  className="text-sm font-medium px-4 py-2 rounded-lg transition-all text-slate-400 hover:text-white"
-                  style={{ border: '1px solid #1E3A5F' }}
-                >
-                  Logout
-                </button>
+          {/* ── DESKTOP TOPBAR (visible only >= lg) ── */}
+          <div className="hidden lg:flex items-center justify-between w-full h-full">
+            {/* Logo section — exact same width as sidebar */}
+            <div className="w-[240px] flex-shrink-0 flex items-center gap-2.5 px-4 h-full border-r-2 border-[#e2e8f0]">
+              <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center flex-shrink-0">
+                <Utensils size={15} color="white" />
               </div>
-            ) : (
-              <button
-                onClick={onSignIn}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all"
-                style={{ backgroundColor: '#3B82F6' }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#2563EB'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#3B82F6'}
-              >
-                <LogIn size={15} />
-                <span className="hidden sm:inline">Sign In</span>
-              </button>
-            )}
+              <div className="min-w-0">
+                <p className="text-[#0f172a] font-bold text-sm leading-tight whitespace-nowrap">Smart Mess</p>
+                <p className="text-[#94a3b8] text-xs whitespace-nowrap">Student Initiative</p>
+              </div>
+            </div>
+
+            {/* Desktop Auth */}
+            <div className="flex items-center gap-3 px-6">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-[#0f172a] text-sm font-semibold">{user.name || 'Student'}</p>
+                    <p className="text-[#94a3b8] text-xs">{user.hostel || ''}</p>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="text-sm font-medium px-4 py-2 rounded-lg border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:border-[#cbd5e1]"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onSignIn}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8]"
+                >
+                  <LogIn size={15} />
+                  Sign In
+                </button>
+              )}
+            </div>
           </div>
+
         </div>
       </header>
 
-      {/* Mobile Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 z-40 lg:hidden"
-            style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
-          />
-        )}
-      </AnimatePresence>
+      {/* ── MOBILE OVERLAY ── */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 z-40 lg:hidden bg-[#0f172a]/20"
+        />
+      )}
 
-      {/* Mobile Sidebar */}
-      <motion.aside
-        initial={{ x: '-100%' }}
-        animate={{ x: isOpen ? 0 : '-100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-        className="fixed left-0 top-0 h-screen w-64 z-50 pt-20 lg:hidden flex flex-col"
-        style={{ backgroundColor: '#0D1526', borderRight: '1px solid #1E3A5F' }}
+      {/* ── MOBILE SIDEBAR — slides in from left ── */}
+      <aside
+        className={cn(
+          'fixed left-0 top-0 h-screen w-64 z-50 pt-[57px] flex flex-col bg-white border-r-2 border-[#e2e8f0] lg:hidden',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
       >
-        <nav className="px-3 space-y-1 flex-1">
+        <nav className="px-3 py-4 space-y-0.5 flex-1 overflow-y-auto">
           {navItems.map((item) => <NavButton key={item.label} item={item} />)}
 
           {user && (
             <>
-              <div className="my-4" style={{ borderTop: '1px solid #1E3A5F' }} />
-              <p className="px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+              <div className="my-3 border-t border-[#e2e8f0]" />
+              <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#94a3b8]">
                 My Account
               </p>
               {userNavItems.map((item) => <NavButton key={item.label} item={item} />)}
@@ -143,34 +159,27 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
         </nav>
 
         {!user && (
-          <div className="p-4" style={{ borderTop: '1px solid #1E3A5F' }}>
+          <div className="p-3 border-t border-[#e2e8f0]">
             <button
               onClick={() => { onNavigate('login'); setIsOpen(false); }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-medium transition-all"
-              style={{ backgroundColor: '#3B82F6' }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium bg-[#2563eb]"
             >
-              <LogIn size={16} />
+              <LogIn size={15} />
               Sign In
             </button>
           </div>
         )}
-      </motion.aside>
+      </aside>
 
-      {/* Desktop Sidebar */}
-      <nav
-        className="hidden lg:flex flex-col fixed top-16 left-0 w-64 h-screen z-40 pt-6 px-3"
-        style={{
-          backgroundColor: '#0D1526',
-          borderRight: '1px solid #1E3A5F'
-        }}
-      >
-        <div className="space-y-1 flex-1">
+      {/* ── DESKTOP SIDEBAR ── */}
+      <nav className="hidden lg:flex flex-col fixed top-[57px] left-0 w-[240px] h-screen z-40 bg-white border-r-2 border-[#e2e8f0]">
+        <div className="px-3 py-4 space-y-0.5 flex-1 overflow-y-auto">
           {navItems.map((item) => <NavButton key={item.label} item={item} />)}
 
           {user && (
             <>
-              <div className="my-4" style={{ borderTop: '1px solid #1E3A5F' }} />
-              <p className="px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+              <div className="my-3 border-t border-[#e2e8f0]" />
+              <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#94a3b8]">
                 My Account
               </p>
               {userNavItems.map((item) => <NavButton key={item.label} item={item} />)}
@@ -179,13 +188,12 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
         </div>
 
         {!user && (
-          <div className="pb-8 px-1">
+          <div className="p-3 border-t border-[#e2e8f0]">
             <button
               onClick={() => onNavigate('login')}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-medium"
-              style={{ backgroundColor: '#3B82F6' }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium bg-[#2563eb]"
             >
-              <LogIn size={16} />
+              <LogIn size={15} />
               Sign In
             </button>
           </div>

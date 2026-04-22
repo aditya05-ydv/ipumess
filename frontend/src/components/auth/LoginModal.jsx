@@ -31,7 +31,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      style={{ backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
+      style={{ backgroundColor: 'rgba(15,23,42,0.12)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}
     >
       <motion.div
@@ -40,19 +40,19 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
         exit={{ scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md p-8 rounded-3xl relative overflow-hidden"
-        style={{ backgroundColor: '#1E2A3A', border: '1px solid #1E3A5F', boxShadow: '0 25px 60px rgba(0,0,0,0.6)' }}
+        style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: 'none' }}
       >
         {/* Top accent bar */}
         <div
           className="absolute top-0 left-0 right-0 h-1"
-          style={{ background: 'linear-gradient(to right, #3B82F6, #38BDF8)' }}
+          style={{ background: '#ffffff' }}
         />
 
         {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-lg transition-all"
-          style={{ color: '#64748B', backgroundColor: 'rgba(255,255,255,0.05)' }}
+          style={{ color: '#64748b', backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <X size={18} />
         </button>
@@ -64,14 +64,14 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
             style={{ backgroundColor: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)' }}
           >
             {mode === 'admin'
-              ? <Shield size={28} color="#60A5FA" />
-              : <User size={28} color="#60A5FA" />
+              ? <Shield size={28} color="#2563eb" />
+              : <User size={28} color="#2563eb" />
             }
           </div>
-          <h3 className="text-2xl font-black mb-2" style={{ color: '#F1F5F9' }}>
+          <h3 className="text-2xl font-black mb-2" style={{ color: '#0f172a' }}>
             {mode === 'admin' ? 'Admin Login' : 'Welcome Back'}
           </h3>
-          <p className="text-sm" style={{ color: '#64748B' }}>
+          <p className="text-sm" style={{ color: '#64748b' }}>
             {mode === 'admin'
               ? 'Enter admin credentials to manage menus and polls.'
               : 'Login to rate food and participate in polls.'}
@@ -93,14 +93,14 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
 
           {/* Hostel Select */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748B' }}>
+            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
               Select Hostel
             </label>
             <select
               value={formData.hostel}
               onChange={(e) => setFormData({ ...formData, hostel: e.target.value })}
               className="w-full px-4 py-3 rounded-xl outline-none appearance-none cursor-pointer font-medium"
-              style={{ backgroundColor: '#111827', border: '1px solid #1E3A5F', color: '#F1F5F9' }}
+              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
             >
               <option value="bh1">Shivalik BH1</option>
               <option value="bh2">Aravali BH2</option>
@@ -112,7 +112,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
           {/* Room Number — user only */}
           {mode === 'user' && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748B' }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
                 Room Number
               </label>
               <input
@@ -122,14 +122,14 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
                 value={formData.roomNumber}
                 onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl outline-none font-medium"
-                style={{ backgroundColor: '#111827', border: '1px solid #1E3A5F', color: '#F1F5F9' }}
+                style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
               />
             </div>
           )}
 
           {/* PIN / Password */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748B' }}>
+            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
               {mode === 'admin' ? 'Admin Password' : '4-Digit PIN'}
             </label>
             <input
@@ -140,7 +140,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
               value={formData.pin}
               onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
               className="w-full px-4 py-3 rounded-xl outline-none font-medium tracking-widest"
-              style={{ backgroundColor: '#111827', border: '1px solid #1E3A5F', color: '#F1F5F9' }}
+              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
             />
           </div>
 
@@ -150,7 +150,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
               type="button"
               onClick={onClose}
               className="flex-1 py-3 rounded-xl font-medium transition-all"
-              style={{ backgroundColor: '#111827', border: '1px solid #1E3A5F', color: '#94A3B8' }}
+              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#94a3b8' }}
             >
               Cancel
             </button>
@@ -158,7 +158,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
               type="submit"
               disabled={isLoading}
               className="flex-1 py-3 rounded-xl font-medium text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ backgroundColor: '#3B82F6' }}
+              style={{ backgroundColor: '#2563eb' }}
             >
               {isLoading
                 ? <Loader2 className="animate-spin" size={18} />

@@ -106,3 +106,4 @@ export const RATING_STATS = [
     { name: 'Sat', rating: 4.1 },
     { name: 'Sun', rating: 4.8 },
 ];
+
