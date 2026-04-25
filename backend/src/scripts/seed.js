@@ -55,10 +55,17 @@ const seedData = async () => {
         }
 
         console.log('--- Seeding Users ---');
-        if (USER_SEED_DATA.length > 0) {
-            await User.insertMany(USER_SEED_DATA);
-            console.log(`Users seeded: ${USER_SEED_DATA.length}`);
-        }
+if (USER_SEED_DATA.length > 0) {
+    const users = USER_SEED_DATA.map((u) => ({
+        name: u.name,
+        roomNumber: u.roomNumber,
+        hostel: u.hostel,
+        password: hashSecret(u.pin),
+        isFirstLogin: true,
+    }));
+    await User.insertMany(users);
+    console.log(`Users seeded: ${users.length}`);
+}
 
         const menuRows = flattenMenuSeedData();
         console.log('--- Seeding Menus ---');

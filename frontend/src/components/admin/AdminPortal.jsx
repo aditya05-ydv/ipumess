@@ -1,15 +1,28 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, UtensilsCrossed, Vote, Save, Plus, Trash2, BarChart3, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, UtensilsCrossed, Vote, Save, Plus, Trash2, BarChart3, AlertTriangle, KeyRound, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { menuService, pollService, ratingService, fastingService } from '../../services/api';
+import { menuService, pollService, ratingService, fastingService, authService } from '../../services/api';
 import SuggestionBox from './SuggestionBox';
 
 const emptyMeals = () => ({ breakfast: '', lunch: '', snacks: '', dinner: '' });
 const linesToItems = (value) => value.split('\n').map((item) => item.trim()).filter(Boolean);
 
+// ── Responsive hook ──
+const useWindowWidth = () => {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return width;
+};
+
 export const AdminPortal = ({ onBack }) => {
   const { user } = useAuth();
   const hostel = user?.hostel || 'Unknown Hostel';
+  const width = useWindowWidth();
+  const isMobile = width < 768;
 
   const [menu, setMenu] = useState([]);
   const [polls, setPolls] = useState([]);
@@ -24,6 +37,10 @@ export const AdminPortal = ({ onBack }) => {
   const [fastingData, setFastingData] = useState(null);
   const [fastingFestivalInput, setFastingFestivalInput] = useState('');
   const [fastingActionLoading, setFastingActionLoading] = useState(false);
+
+  const [resetRoomNumber, setResetRoomNumber] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -134,10 +151,10 @@ export const AdminPortal = ({ onBack }) => {
   };
 
   const handleResetRatings = () => {
-    if (window.confirm('⚠️ Reset ALL ratings? This cannot be undone.')) resetRatings();
+    if (window.confirm('⚠️ Reset ALL ratings? This cannot be undone.')) resetRatingsData();
   };
 
-  const resetRatings = async () => {
+  const resetRatingsData = async () => {
     setResettingRatings(true);
     try {
       await ratingService.resetAllRatings();
@@ -146,6 +163,24 @@ export const AdminPortal = ({ onBack }) => {
     } catch (error) {
       alert('Failed to reset: ' + (error.response?.data?.message || error.message));
     } finally { setResettingRatings(false); }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetRoomNumber.trim()) {
+      setResetMessage({ type: 'error', text: 'Please enter a room number.' });
+      return;
+    }
+    setResetLoading(true);
+    setResetMessage(null);
+    try {
+      await authService.resetPassword({ roomNumber: resetRoomNumber.trim(), hostel: user?.hostel });
+      setResetMessage({ type: 'success', text: `✅ Password reset to default PIN for Room ${resetRoomNumber}.` });
+      setResetRoomNumber('');
+    } catch (error) {
+      setResetMessage({ type: 'error', text: error.response?.data?.message || 'Failed to reset password.' });
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   const totalVotes = polls.reduce((sum, poll) => sum + poll.options.reduce((s, o) => s + o.votes, 0), 0);
@@ -161,73 +196,114 @@ export const AdminPortal = ({ onBack }) => {
   }
 
   const tabs = [
-    { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
-    { id: 'polls', label: 'Polls', icon: Vote },
-    { id: 'ratings', label: 'Ratings', icon: BarChart3 },
-    { id: 'fasting', label: 'Fasting', icon: UtensilsCrossed },
-    { id: 'suggestions', label: 'Suggestions', icon: BarChart3 },
+    { id: 'menu',        label: 'Menu',         icon: UtensilsCrossed },
+    { id: 'polls',       label: 'Polls',        icon: Vote },
+    { id: 'ratings',     label: 'Ratings',      icon: BarChart3 },
+    { id: 'fasting',     label: 'Fasting',      icon: UtensilsCrossed },
+    { id: 'suggestions', label: 'Suggestions',  icon: BarChart3 },
+    { id: 'password',    label: 'Password',     icon: KeyRound },
   ];
 
   return (
-    <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '40px 24px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <div style={{
+      maxWidth: '1152px',
+      margin: '0 auto',
+      padding: isMobile ? '16px 12px 80px' : '40px 24px',
+      backgroundColor: '#f8fafc',
+      minHeight: '100vh',
+    }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+      {/* ── HEADER ── */}
+      <div style={{
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        gap: isMobile ? '12px' : '0',
+        marginBottom: isMobile ? '20px' : '32px',
+      }}>
         <div>
-          <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: '0 0 4px' }}>Admin Dashboard</h2>
-          <p style={{ color: '#64748b', margin: 0 }}>Managing <span style={{ fontWeight: '600', color: '#0f172a' }}>{hostel}</span></p>
+          <h2 style={{ fontSize: isMobile ? '22px' : '32px', fontWeight: '800', color: '#0f172a', margin: '0 0 4px' }}>Admin Dashboard</h2>
+          <p style={{ color: '#64748b', margin: 0, fontSize: isMobile ? '13px' : '14px' }}>
+            Managing <span style={{ fontWeight: '600', color: '#0f172a' }}>{hostel}</span>
+          </p>
         </div>
         <button
           onClick={() => { onBack(); window.scrollTo(0, 0); }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', fontWeight: '500', fontSize: '14px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', color: '#475569', cursor: 'pointer' }}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '10px 20px', borderRadius: '10px', fontWeight: '500', fontSize: '14px',
+            backgroundColor: '#ffffff', border: '1px solid #e2e8f0', color: '#475569', cursor: 'pointer',
+            alignSelf: isMobile ? 'flex-start' : 'auto',
+          }}
         >
           <ChevronLeft size={17} /> Exit Admin
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '28px' }}>
+      {/* ── STATS CARDS ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+        gap: isMobile ? '8px' : '12px',
+        marginBottom: isMobile ? '20px' : '28px',
+      }}>
         {[
           { label: 'Active Polls', value: activePollsCount, color: '#2563eb' },
-          { label: 'Total Votes', value: totalVotes, color: '#7c3aed' },
-          { label: 'Ratings', value: totalRatings, color: '#16a34a' },
-          { label: 'Menu Days', value: menu.length, color: '#d97706' },
-          { label: 'Hostel', value: hostel, color: '#0891b2' },
+          { label: 'Total Votes',  value: totalVotes,       color: '#7c3aed' },
+          { label: 'Ratings',      value: totalRatings,     color: '#16a34a' },
+          { label: 'Menu Days',    value: menu.length,      color: '#d97706' },
+          { label: 'Hostel',       value: hostel,           color: '#0891b2' },
         ].map(({ label, value, color }) => (
-          <div key={label} style={{ padding: '20px', borderRadius: '12px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
-            <p style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color, margin: '0 0 8px' }}>{label}</p>
-            <p style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</p>
+          <div key={label} style={{
+            padding: isMobile ? '14px' : '20px',
+            borderRadius: '12px',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            // make Hostel card full width on mobile (5th item in 2-col grid)
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color, margin: '0 0 6px' }}>{label}</p>
+            <p style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '800', color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</p>
           </div>
         ))}
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid #e2e8f0', marginBottom: '24px' }}>
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '10px 18px', fontSize: '13.5px', fontWeight: '500', background: 'none', border: 'none', borderBottom: activeTab === id ? '2px solid #2563eb' : '2px solid transparent', color: activeTab === id ? '#2563eb' : '#64748b', cursor: 'pointer', marginBottom: '-1px' }}
-          >
-            <Icon size={15} /> {label}
-          </button>
-        ))}
-      </div>
+      {/* ── DESKTOP TABS ── */}
+      {!isMobile && (
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '2px solid #e2e8f0', marginBottom: '24px', overflowX: 'auto' }}>
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '7px',
+                padding: '10px 18px', fontSize: '13.5px', fontWeight: '500',
+                background: 'none', border: 'none', whiteSpace: 'nowrap',
+                borderBottom: activeTab === id ? '2px solid #2563eb' : '2px solid transparent',
+                color: activeTab === id ? '#2563eb' : '#64748b',
+                cursor: 'pointer', marginBottom: '-2px',
+              }}
+            >
+              <Icon size={15} /> {label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Menu Tab */}
+      {/* ── MENU TAB ── */}
       {activeTab === 'menu' && (
-        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 20px' }}>Weekly Menu</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {menu.map((day) => (
-              <div key={day.day} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+              <div key={day.day} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '12px 14px' : '16px 20px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <h4 style={{ fontWeight: '600', color: '#0f172a', margin: '0 0 4px' }}>{day.day}</h4>
+                  <h4 style={{ fontWeight: '600', color: '#0f172a', margin: '0 0 4px', fontSize: isMobile ? '14px' : '16px' }}>{day.day}</h4>
                   <p style={{ fontSize: '13px', color: '#64748b', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Lunch: {day.menu.lunch}</p>
                 </div>
                 <button
                   onClick={() => openMenuEditor(day)}
-                  style={{ marginLeft: '16px', padding: '8px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', color: '#ffffff', backgroundColor: '#2563eb', border: 'none', cursor: 'pointer' }}
+                  style={{ marginLeft: '12px', padding: isMobile ? '7px 14px' : '8px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', color: '#ffffff', backgroundColor: '#2563eb', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
                   Edit
                 </button>
@@ -237,10 +313,10 @@ export const AdminPortal = ({ onBack }) => {
         </div>
       )}
 
-      {/* Polls Tab */}
+      {/* ── POLLS TAB ── */}
       {activeTab === 'polls' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 20px' }}>Create Poll</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input
@@ -265,7 +341,7 @@ export const AdminPortal = ({ onBack }) => {
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 20px' }}>Active Polls ({activePollsCount})</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '384px', overflowY: 'auto' }}>
               {polls.filter(p => !p.isExpired).length === 0 ? (
@@ -299,21 +375,21 @@ export const AdminPortal = ({ onBack }) => {
         </div>
       )}
 
-      {/* Ratings Tab */}
+      {/* ── RATINGS TAB ── */}
       {activeTab === 'ratings' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: '20px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 20px' }}>Weekly Ratings</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {weeklyGraphData.map((day) => (
-                <div key={day.day} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ width: '80px', fontSize: '13px', fontWeight: '500', color: '#475569', flexShrink: 0 }}>{day.day}</div>
+                <div key={day.day} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '16px' }}>
+                  <div style={{ width: isMobile ? '60px' : '80px', fontSize: '13px', fontWeight: '500', color: '#475569', flexShrink: 0 }}>{day.day}</div>
                   <div style={{ flex: 1, height: '28px', backgroundColor: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${(day.avgRating / 5) * 100}%`, backgroundColor: day.avgRating >= 4 ? '#16a34a' : day.avgRating >= 3 ? '#d97706' : '#ef4444', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '10px' }}>
                       {day.avgRating > 0 && <span style={{ fontSize: '11px', fontWeight: '700', color: '#ffffff' }}>{day.avgRating.toFixed(1)}</span>}
                     </div>
                   </div>
-                  <div style={{ width: '100px', textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ width: isMobile ? '70px' : '100px', textAlign: 'right', flexShrink: 0 }}>
                     <p style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', margin: '0 0 2px' }}>{day.voteCount} ratings</p>
                     <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>{day.quality}</p>
                   </div>
@@ -321,7 +397,6 @@ export const AdminPortal = ({ onBack }) => {
               ))}
             </div>
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button
               onClick={handleResetRatings}
@@ -339,10 +414,10 @@ export const AdminPortal = ({ onBack }) => {
         </div>
       )}
 
-      {/* Fasting Tab */}
+      {/* ── FASTING TAB ── */}
       {activeTab === 'fasting' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 6px' }}>Fasting Register Control</h3>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px' }}>Activate to let students register their fasting. Auto-deletes after 48 hours.</p>
             <div style={{ padding: '16px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
@@ -386,14 +461,14 @@ export const AdminPortal = ({ onBack }) => {
             )}
           </div>
 
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Students Fasting ({fastingData?.entries?.length || 0})</h3>
               <button
                 onClick={handlePrintFasting}
                 style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', cursor: 'pointer' }}
               >
-                🖨️ Print List
+                🖨️ Print
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '384px', overflowY: 'auto' }}>
@@ -413,23 +488,64 @@ export const AdminPortal = ({ onBack }) => {
         </div>
       )}
 
-      {/* Suggestions Tab */}
+      {/* ── SUGGESTIONS TAB ── */}
       {activeTab === 'suggestions' && (
         <SuggestionBox />
       )}
 
-      {/* Menu Edit Modal */}
+      {/* ── RESET PASSWORD TAB ── */}
+      {activeTab === 'password' && (
+        <div style={{ maxWidth: isMobile ? '100%' : '480px' }}>
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '16px' : '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <KeyRound size={18} color="#2563eb" />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Reset Student Password</h3>
+            </div>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 24px', lineHeight: '1.6' }}>
+              Enter a room number to reset that student's password back to their original PIN. They will be prompted to set a new password on next login.
+            </p>
+            {resetMessage && (
+              <div style={{ padding: '12px 16px', borderRadius: '10px', marginBottom: '16px', fontSize: '13px', fontWeight: '600', backgroundColor: resetMessage.type === 'success' ? '#f0fdf4' : '#fef2f2', border: `1px solid ${resetMessage.type === 'success' ? '#bbf7d0' : '#fecaca'}`, color: resetMessage.type === 'success' ? '#16a34a' : '#dc2626' }}>
+                {resetMessage.text}
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '8px' }}>Room Number</label>
+                <input
+                  type="text"
+                  value={resetRoomNumber}
+                  onChange={e => { setResetRoomNumber(e.target.value); setResetMessage(null); }}
+                  placeholder="e.g. 302"
+                  style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '14px', color: '#0f172a', backgroundColor: '#f8fafc', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ padding: '12px 16px', borderRadius: '10px', backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
+                <p style={{ fontSize: '12px', color: '#92400e', margin: 0, lineHeight: '1.5' }}>
+                  ⚠️ This will reset the password for <strong>{hostel}</strong> only. Student will be forced to set a new password on next login.
+                </p>
+              </div>
+              <button
+                onClick={handleResetPassword}
+                disabled={resetLoading}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '10px', fontWeight: '600', fontSize: '14px', color: '#ffffff', backgroundColor: resetLoading ? '#93c5fd' : '#2563eb', border: 'none', cursor: resetLoading ? 'not-allowed' : 'pointer' }}
+              >
+                <RotateCcw size={15} />
+                {resetLoading ? 'Resetting...' : 'Reset Password'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MENU EDIT MODAL ── */}
       {editingDay && (
-        <div
-          onClick={() => setEditingDay(null)}
-          style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'rgba(15,23,42,0.4)' }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '640px', padding: '32px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
-          >
+        <div onClick={() => setEditingDay(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'rgba(15,23,42,0.4)' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '640px', padding: isMobile ? '20px' : '32px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: '0 0 24px' }}>Edit {editingDay} Menu</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
               {['breakfast', 'lunch', 'snacks', 'dinner'].map((mealType) => (
                 <div key={mealType}>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b', marginBottom: '8px' }}>{mealType}</label>
@@ -453,16 +569,10 @@ export const AdminPortal = ({ onBack }) => {
         </div>
       )}
 
-      {/* Delete Poll Modal */}
+      {/* ── DELETE POLL MODAL ── */}
       {deletingPollId && (
-        <div
-          onClick={() => setDeletingPollId(null)}
-          style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'rgba(15,23,42,0.4)' }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '440px', padding: '32px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}
-          >
+        <div onClick={() => setDeletingPollId(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'rgba(15,23,42,0.4)' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '440px', padding: isMobile ? '20px' : '32px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <AlertTriangle size={22} color="#ef4444" />
             </div>
@@ -475,6 +585,35 @@ export const AdminPortal = ({ onBack }) => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── MOBILE BOTTOM TAB BAR ── */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+          backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0',
+          display: 'flex', alignItems: 'stretch',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}>
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              style={{
+                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                justifyContent: 'center', gap: '3px', padding: '8px 2px',
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: activeTab === id ? '#2563eb' : '#94a3b8',
+                borderTop: activeTab === id ? '2px solid #2563eb' : '2px solid transparent',
+              }}
+            >
+              <Icon size={18} />
+              <span style={{ fontSize: '9px', fontWeight: activeTab === id ? '700' : '500', lineHeight: 1 }}>
+                {label === 'Suggestions' ? 'Suggest' : label === 'Password' ? 'Password' : label}
+              </span>
+            </button>
+          ))}
         </div>
       )}
 

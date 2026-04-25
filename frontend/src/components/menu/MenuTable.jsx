@@ -125,8 +125,7 @@ export const MenuTable = ({ hostelId, onDayClick, onSelectHostel, onSignInClick 
         }}>
           Select Hostel
         </p>
-        <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}
-          className="no-scrollbar">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
           {HOSTELS.map((item) => {
             const isActive = hostelId === item.id;
             const isMyHostel = user?.hostelId === item.id;

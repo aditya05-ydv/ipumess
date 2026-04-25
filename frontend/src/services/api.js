@@ -1,18 +1,3 @@
-/**
- * api.js — Frontend API Service Layer
- * -------------------------------------
- * Base URL: VITE_API_URL or http://localhost:3000/api
- *
- * Services:
- *  - authService    → login, adminLogin
- *  - menuService    → getMenu, updateMenu, deleteMenuDay
- *  - ratingService  → submitRating, getStats, getItemStats, getWeeklyGraphData, getWeeklyAverages, resetAllRatings
- *  - pollService    → getPolls, getCurrentPolls, createPoll, vote, deletePoll, resetPolls, getPollResults, getExpiredPolls
- *
- * Auth:
- *  - setAuthToken() → sets/removes Bearer token on all requests
- */
-
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -39,6 +24,14 @@ export const authService = {
     },
     adminLogin: async (hostel, password) => {
         const response = await api.post('/auth/admin/login', { hostel, password });
+        return response.data;
+    },
+    changePassword: async ({ userId, currentPassword, newPassword }) => {
+        const response = await api.post('/auth/change-password', { userId, currentPassword, newPassword });
+        return response.data;
+    },
+    resetPassword: async ({ roomNumber, hostel }) => {
+        const response = await api.post('/auth/reset-password', { roomNumber, hostel });
         return response.data;
     },
 };
@@ -118,7 +111,7 @@ export const pollService = {
         const response = await api.get('/poll/expired');
         return response.data;
     },
-}
+};
 
 // ============================================================
 // FASTING REGISTER FEATURE - SERVICE
@@ -153,7 +146,5 @@ export const fastingService = {
 // ============================================================
 // END FASTING REGISTER FEATURE - SERVICE
 // ============================================================
-
-
 
 export default api;

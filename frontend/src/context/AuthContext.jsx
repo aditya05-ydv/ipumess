@@ -22,11 +22,26 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const data = await authService.login(hostel, roomNumber, pin);
+
+      // First login — don't set user/token yet, return flag to page
+      if (data.isFirstLogin) {
+        return {
+          isFirstLogin: true,
+          userId: data.userId,
+          hostel: data.hostel,
+          roomNumber: data.roomNumber,
+        };
+      }
+
+      // Normal login
       setToken(data.token);
       setAuthToken(data.token);
       setUser(data.user);
       localStorage.setItem('mess_token', data.token);
       localStorage.setItem('mess_user', JSON.stringify(data.user));
+
+      return { isFirstLogin: false };
+
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed. Please try again.';
       setError(message);

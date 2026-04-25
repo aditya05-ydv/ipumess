@@ -1,106 +1,186 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
-import { X, User, Loader2, Shield } from 'lucide-react';
+import { X, User, Loader2, Shield, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 export const LoginModal = ({ onClose, mode = 'user' }) => {
   const { login, adminLogin, isLoading, error } = useAuth();
-  const [formData, setFormData] = useState({
-    hostel: 'bh1',
-    roomNumber: '',
-    pin: ''
-  });
+  const [formData, setFormData] = useState({ hostel: 'bh1', roomNumber: '', pin: '' });
+
+  // First login state
+  const [firstLogin, setFirstLogin] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changeError, setChangeError] = useState('');
+  const [changeLoading, setChangeLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (mode === 'admin') {
         await adminLogin(formData.hostel, formData.pin);
+        onClose();
       } else {
-        await login(formData.hostel, formData.roomNumber, formData.pin);
+        const result = await login(formData.hostel, formData.roomNumber, formData.pin);
+        if (result?.isFirstLogin) {
+          setFirstLogin({
+            userId: result.userId,
+            currentPin: formData.pin,
+          });
+        } else {
+          onClose();
+        }
       }
+    } catch (err) {}
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setChangeError('');
+
+    if (newPassword.length < 4 || newPassword.length > 20) {
+      setChangeError('Password must be 4-20 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangeError('Passwords do not match.');
+      return;
+    }
+
+    setChangeLoading(true);
+    try {
+      await api.changePassword({
+        userId: firstLogin.userId,
+        currentPassword: firstLogin.currentPin,
+        newPassword,
+      });
+      await login(formData.hostel, formData.roomNumber, newPassword);
       onClose();
     } catch (err) {
-      // handled by context
+      setChangeError(err?.message || 'Failed to change password.');
+    } finally {
+      setChangeLoading(false);
     }
   };
 
+  // ── SET NEW PASSWORD SCREEN ──
+  if (firstLogin) {
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0f172a]/10"
+        onClick={onClose}
+      >
+        <div
+          className="w-full max-w-md p-8 rounded-2xl relative bg-white border border-[#e2e8f0]"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#2563eb] rounded-t-2xl" />
+
+          <button onClick={onClose} className="absolute top-5 right-5 p-2 rounded-lg text-[#64748b] hover:text-[#0f172a]">
+            <X size={18} />
+          </button>
+
+          <div className="text-center mb-7 pt-2">
+            <div className="w-12 h-12 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center mx-auto mb-3">
+              <Lock size={20} color="#2563eb" />
+            </div>
+            <h3 className="text-xl font-extrabold text-[#0f172a] mb-1">Set Your Password</h3>
+            <p className="text-xs text-[#94a3b8]">First login — choose a new password (4-20 characters)</p>
+          </div>
+
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            {changeError && (
+              <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm font-semibold text-[#dc2626]">
+                {changeError}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-[#94a3b8] mb-2">New Password</label>
+              <input
+                type="password"
+                required
+                minLength={4}
+                maxLength={20}
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                placeholder="Min 4 characters"
+                className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-[#94a3b8] mb-2">Confirm Password</label>
+              <input
+                type="password"
+                required
+                minLength={4}
+                maxLength={20}
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+                className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={onClose}
+                className="flex-1 py-3 rounded-xl font-medium border border-[#e2e8f0] text-[#64748b] bg-white">
+                Cancel
+              </button>
+              <button type="submit" disabled={changeLoading}
+                className="flex-1 py-3 rounded-xl font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8] flex items-center justify-center gap-2 disabled:opacity-50">
+                {changeLoading ? <Loader2 className="animate-spin" size={16} /> : 'Save Password'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── NORMAL LOGIN ──
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      style={{ backgroundColor: 'rgba(15,23,42,0.12)', backdropFilter: 'blur(8px)' }}
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0f172a]/10"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md p-8 rounded-3xl relative overflow-hidden"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: 'none' }}
+      <div
+        className="w-full max-w-md p-8 rounded-2xl relative bg-white border border-[#e2e8f0]"
+        onClick={e => e.stopPropagation()}
       >
-        {/* Top accent bar */}
-        <div
-          className="absolute top-0 left-0 right-0 h-1"
-          style={{ background: '#ffffff' }}
-        />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#2563eb] rounded-t-2xl" />
 
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-lg transition-all"
-          style={{ color: '#64748b', backgroundColor: 'rgba(255,255,255,0.05)' }}
-        >
+        <button onClick={onClose} className="absolute top-5 right-5 p-2 rounded-lg text-[#64748b] hover:text-[#0f172a]">
           <X size={18} />
         </button>
 
-        {/* Header */}
-        <div className="text-center mb-8 pt-2">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
-            style={{ backgroundColor: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)' }}
-          >
-            {mode === 'admin'
-              ? <Shield size={28} color="#2563eb" />
-              : <User size={28} color="#2563eb" />
-            }
+        <div className="text-center mb-7 pt-2">
+          <div className="w-12 h-12 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center mx-auto mb-3">
+            {mode === 'admin' ? <Shield size={20} color="#2563eb" /> : <User size={20} color="#2563eb" />}
           </div>
-          <h3 className="text-2xl font-black mb-2" style={{ color: '#0f172a' }}>
+          <h3 className="text-xl font-extrabold text-[#0f172a] mb-1">
             {mode === 'admin' ? 'Admin Login' : 'Welcome Back'}
           </h3>
-          <p className="text-sm" style={{ color: '#64748b' }}>
-            {mode === 'admin'
-              ? 'Enter admin credentials to manage menus and polls.'
-              : 'Login to rate food and participate in polls.'}
+          <p className="text-xs text-[#94a3b8]">
+            {mode === 'admin' ? 'Enter admin credentials.' : 'Login to rate food and participate in polls.'}
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* Error */}
           {error && (
-            <div
-              className="p-3 rounded-xl text-sm font-medium"
-              style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#FCA5A5' }}
-            >
+            <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm font-semibold text-[#dc2626]">
               {error}
             </div>
           )}
 
-          {/* Hostel Select */}
+          {/* Hostel */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
-              Select Hostel
-            </label>
+            <label className="block text-[10px] font-bold tracking-widest uppercase text-[#94a3b8] mb-2">Select Hostel</label>
             <select
               value={formData.hostel}
-              onChange={(e) => setFormData({ ...formData, hostel: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl outline-none appearance-none cursor-pointer font-medium"
-              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
+              onChange={e => setFormData({ ...formData, hostel: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
             >
               <option value="bh1">Shivalik BH1</option>
               <option value="bh2">Aravali BH2</option>
@@ -112,69 +192,52 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
           {/* Room Number — user only */}
           {mode === 'user' && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
-                Room Number
-              </label>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-[#94a3b8] mb-2">Room Number</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. 302"
                 value={formData.roomNumber}
-                onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl outline-none font-medium"
-                style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
+                onChange={e => setFormData({ ...formData, roomNumber: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
               />
             </div>
           )}
 
-          {/* PIN / Password */}
+          {/* Password */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#64748b' }}>
-              {mode === 'admin' ? 'Admin Password' : '4-Digit PIN'}
+            <label className="block text-[10px] font-bold tracking-widest uppercase text-[#94a3b8] mb-2">
+              {mode === 'admin' ? 'Admin Password' : 'Password'}
             </label>
             <input
               type="password"
               required
-              maxLength={mode === 'admin' ? 64 : 4}
-              placeholder={mode === 'admin' ? 'Password' : '••••'}
+              maxLength={mode === 'admin' ? 64 : 20}
+              placeholder="Enter your password"
               value={formData.pin}
-              onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl outline-none font-medium tracking-widest"
-              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#F1F5F9' }}
+              onChange={e => setFormData({ ...formData, pin: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl font-medium transition-all"
-              style={{ backgroundColor: '#111827', border: '1px solid #e2e8f0', color: '#94a3b8' }}
-            >
+            <button type="button" onClick={onClose}
+              className="flex-1 py-3 rounded-xl font-medium border border-[#e2e8f0] text-[#64748b] bg-white">
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 py-3 rounded-xl font-medium text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ backgroundColor: '#2563eb' }}
-            >
-              {isLoading
-                ? <Loader2 className="animate-spin" size={18} />
-                : mode === 'admin' ? 'Admin Login' : 'Login'
-              }
+            <button type="submit" disabled={isLoading}
+              className="flex-1 py-3 rounded-xl font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8] flex items-center justify-center gap-2 disabled:opacity-50">
+              {isLoading ? <Loader2 className="animate-spin" size={16} /> : mode === 'admin' ? 'Admin Login' : 'Login'}
             </button>
           </div>
 
-          {/* Hint */}
           {mode === 'user' && (
-            <p className="text-center text-xs italic" style={{ color: '#475569' }}>
-              Forgot PIN? Contact the Mess Secretary.
+            <p className="text-center text-xs text-[#94a3b8]">
+              Forgot password? Contact the Mess Admin.
             </p>
           )}
         </form>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
