@@ -2,22 +2,20 @@ import Suggestion from '../models/Suggestion.js';
 import nodemailer from 'nodemailer';
 import { wardenConfig, chiefWardenEmails } from '../config/wardenConfig.js';
 
-// change by antigracity — guard transporter creation so missing email env vars don't crash server
-const transporter = process.env.EMAIL_USER
-  ? nodemailer.createTransport({
+// Submit suggestion
+export const submitSuggestion = async (req, res) => {
+  try {
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASS
       }
-    })
-  : null;
+    });
 
-// Submit suggestion
-export const submitSuggestion = async (req, res) => {
-  try {
+    
+
     const { suggestionText, recipientType } = req.body;
-    // change by antigracity — fixed req.user → req.auth (auth middleware sets req.auth, not req.user)
     const { name, roomNumber, hostel } = req.auth;
 
     if (!suggestionText || !recipientType) {
@@ -35,10 +33,9 @@ export const submitSuggestion = async (req, res) => {
     await suggestion.save();
 
     // Send email if warden or chief warden
-    // change by antigracity — added transporter null check so missing EMAIL_USER doesn't crash
     if (recipientType === 'hostel_warden') {
       const warden = wardenConfig[hostel];
-      if (warden && transporter) {
+      if (warden) {
         await transporter.sendMail({
           from: `"Smart Mess - Anonymous" <${process.env.EMAIL_USER}>`,
           to: warden.wardenEmail,
@@ -53,9 +50,10 @@ export const submitSuggestion = async (req, res) => {
             <hr/>
             <small style="color:gray;">Sender identity is anonymous. Contact developer if tracking is needed.</small>
           `
-        });
+        }).then(() => console.log('✅ Email sent to:', warden.wardenEmail))
+          .catch(err => console.log('❌ Email error:', err.message));
       }
-    } else if (recipientType === 'chief_warden' && transporter) { // change by antigracity — null check
+    } else if (recipientType === 'chief_warden') {
       await transporter.sendMail({
         from: `"Smart Mess - Anonymous" <${process.env.EMAIL_USER}>`,
         to: chiefWardenEmails.join(','),
@@ -70,7 +68,8 @@ export const submitSuggestion = async (req, res) => {
           <hr/>
           <small style="color:gray;">Sender identity is anonymous. Contact developer if tracking is needed.</small>
         `
-      });
+      }).then(() => console.log('✅ Chief warden email sent'))
+        .catch(err => console.log('❌ Email error:', err.message));
     }
 
     res.status(201).json({ message: 'Suggestion submitted successfully' });

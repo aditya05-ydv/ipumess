@@ -12,8 +12,8 @@ const SuggestionPage = () => {
 
   const recipientOptions = [
     { value: 'mess_secretary', label: 'Mess Secretary', description: 'For mess-related issues and food quality feedback', icon: '🍽️' },
-    { value: 'hostel_warden', label: `${user?.hostel} Warden`, description: 'For hostel facilities and maintenance issues', icon: '🏠' },
-    { value: 'chief_warden', label: 'Chief Warden', description: 'For serious complaints or escalated issues', icon: '⭐' },
+    { value: 'hostel_warden', label: `${user?.hostel} Warden Office`, description: 'For hostel facilities and maintenance issues', icon: '🏠' },
+   { value: 'chief_warden', label: 'Chief Warden', description: 'Currently unavailable', icon: '⭐', disabled: true },
   ];
 
   const handleSubmit = async () => {
@@ -79,15 +79,18 @@ const SuggestionPage = () => {
               {recipientOptions.map(opt => {
                 const isActive = recipientType === opt.value;
                 return (
-                  <button
-                    key={opt.value}
-                    onClick={() => setRecipientType(opt.value)}
-                    className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-colors cursor-pointer
-                      ${isActive
-                        ? 'bg-[#eff6ff] border-[#2563eb]'
-                        : 'bg-white border-[#e2e8f0] hover:border-[#bfdbfe]'
-                      }`}
-                  >
+                 <button
+  key={opt.value}
+  onClick={() => !opt.disabled && setRecipientType(opt.value)}
+  disabled={opt.disabled}
+  className={`flex items-center gap-3 p-4 rounded-xl text-left border transition-colors
+    ${opt.disabled
+      ? 'bg-[#f1f5f9] border-[#e2e8f0] cursor-not-allowed opacity-50'
+      : isActive
+        ? 'bg-[#eff6ff] border-[#2563eb] cursor-pointer'
+        : 'bg-white border-[#e2e8f0] hover:border-[#bfdbfe] cursor-pointer'
+    }`}
+>
                     <span className="text-xl shrink-0">{opt.icon}</span>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-bold ${isActive ? 'text-[#2563eb]' : 'text-[#0f172a]'}`}>
