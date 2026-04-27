@@ -377,9 +377,9 @@ export const getDayMealRatings = async (req, res) => {
     const filteredMeals = meals.map(meal => {
       if (targetDateStr === todayStr) {
         const unlockHour = MEAL_UNLOCK_HOURS[meal.mealType];
-        if (currentHour < unlockHour) {
-          return { ...meal, avgRating: null, totalRatings: 0 };
-        }
+       if (currentHour < unlockHour && meal.totalRatings === 0) {
+  return { ...meal, avgRating: null, totalRatings: 0 };
+}
       }
       return meal;
     });

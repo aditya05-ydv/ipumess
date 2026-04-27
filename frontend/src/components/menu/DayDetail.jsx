@@ -348,9 +348,6 @@ export const DayDetail = ({ dayMenu, onClose, onRequireLogin, hostelId = 'bh1', 
                           }}>
                             {quality}
                           </div>
-                          <p style={{ fontSize: '9px', color: '#94a3b8', marginTop: '4px' }}>
-                            {meal.totalRatings} ratings
-                          </p>
                         </>
                       ) : (
                         <p style={{ fontSize: '11px', color: '#94a3b8' }}>No data</p>
@@ -423,7 +420,6 @@ export const DayDetail = ({ dayMenu, onClose, onRequireLogin, hostelId = 'bh1', 
                           {section.title}
                         </h3>
                         <p style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
-                          {stats.count ? `${stats.avg.toFixed(1)} / 5 · ${stats.count} ratings` : 'No ratings yet'}
                         </p>
                       </div>
                     </div>

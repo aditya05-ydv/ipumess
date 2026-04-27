@@ -220,9 +220,7 @@ export const DailyRatingGraph = ({ dayName }) => {
                       }}>
                         {meal.avgRating.toFixed(1)}
                       </p>
-                      <p style={{ fontSize: '9px', color: '#94a3b8', marginTop: '2px' }}>
-                        {meal.totalRatings} votes
-                      </p>
+                      
                     </>
                   ) : (
                     <p style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600 }}>
