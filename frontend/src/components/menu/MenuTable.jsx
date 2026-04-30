@@ -3,6 +3,7 @@ import { Loader2, LogIn, ChevronRight, Utensils, Lock } from 'lucide-react';
 import { HOSTELS } from '../../data/menuData';
 import { menuService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { canRateMeal, getMealLockReason } from '../../utils/timeUtils';
 
 const MEAL_COLORS = {
@@ -20,6 +21,7 @@ const getHostelRatingStatus = (user, hostelId) => {
 
 export const MenuTable = ({ hostelId, onDayClick, onSelectHostel, onSignInClick }) => {
   const { user } = useAuth();
+  const { clearNotification } = useNotifications();
   const [menu, setMenu] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState('');
@@ -28,6 +30,11 @@ export const MenuTable = ({ hostelId, onDayClick, onSelectHostel, onSignInClick 
 
   const hostel = useMemo(() => HOSTELS.find((item) => item.id === hostelId), [hostelId]);
   const hostelStatus = getHostelRatingStatus(user, hostelId);
+
+  // 🔴 Clear menu notification when user visits this page
+  useEffect(() => {
+    clearNotification('menu');
+  }, []);
 
   const showToast = (msg) => {
     setToastMsg(msg);

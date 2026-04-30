@@ -1,5 +1,6 @@
 import Menu from '../models/Menu.js';
 import { normalizeHostel } from '../config/hostels.js';
+import { getIO } from '../sockets/index.js';
 
 const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -73,6 +74,14 @@ export const upsertMyHostelDayMenu = async (req, res) => {
 
     try {
         const updated = await Menu.findOneAndUpdate({ hostel: normalizedHostel, day }, { meals }, { new: true, upsert: true });
+
+        // 🔴 Notify all users of this hostel that menu changed
+        try {
+            getIO().to(normalizedHostel).emit('menuUpdated', { hostel: normalizedHostel, day });
+        } catch (e) {
+            console.error('Socket emit error:', e);
+        }
+
         return res.status(200).json({ message: 'Menu saved successfully', menu: updated });
     }
     catch (error) {
@@ -97,6 +106,14 @@ export const deleteMyHostelDayMenu = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ message: `No menu found for ${normalizedHostel} on ${day}` });
         }
+
+        // 🔴 Notify all users of this hostel that menu changed
+        try {
+            getIO().to(normalizedHostel).emit('menuUpdated', { hostel: normalizedHostel, day });
+        } catch (e) {
+            console.error('Socket emit error:', e);
+        }
+
         return res.status(200).json({ message: 'Menu deleted successfully' });
     }
     catch (error) {

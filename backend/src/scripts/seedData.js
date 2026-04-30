@@ -373,6 +373,8 @@ export const USER_SEED_DATA = [
   { "name": "AASHUTOSH MISHRA", "roomNumber": "917", "hostel": "Aravali BH2", "pin": "9351" },
   { "name": "RISHABH YADAV", "roomNumber": "918", "hostel": "Aravali BH2", "pin": "2816" },
   { "name": "AVNISH SINGH", "roomNumber": "919", "hostel": "Aravali BH2", "pin": "7694" },
+  { "name": "checking demo", "roomNumber": "920", "hostel": "Aravali BH2", "pin": "9022" },
+
 
   //nilgiri gh2 
   
@@ -558,7 +560,9 @@ export const USER_SEED_DATA = [
   { "name": "JYOTIKA", "roomNumber": "915", "hostel": "Nilgiri GH2", "pin": "6943" },
   { "name": "MANMEET DHILLON", "roomNumber": "916", "hostel": "Nilgiri GH2", "pin": "8712" },
   { "name": "ANANYA SINHA", "roomNumber": "917", "hostel": "Nilgiri GH2", "pin": "2358" },
-  { "name": "DIKSHA GUPTA", "roomNumber": "918", "hostel": "Nilgiri GH2", "pin": "9021" }
+  { "name": "DIKSHA GUPTA", "roomNumber": "918", "hostel": "Nilgiri GH2", "pin": "9021" },
+  { "name": "checking demo", "roomNumber": "919", "hostel": "Nilgiri GH2", "pin": "9022" },
+
 ]
 
 

@@ -3,6 +3,7 @@ import { Loader2, LogIn, ChevronLeft, Vote, Plus, X, Send, CheckCircle2 } from '
 import { pollService, fastingService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import { useNotifications } from '../../context/NotificationContext';
 
 export const Polls = ({ onVote, onBack }) => {
   const [userPolls, setUserPolls] = useState([]);
@@ -19,6 +20,7 @@ export const Polls = ({ onVote, onBack }) => {
   const [fastingEditing, setFastingEditing] = useState(false);
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { clearNotification } = useNotifications();
 
   const fetchFasting = async () => {
     try {
@@ -49,6 +51,7 @@ export const Polls = ({ onVote, onBack }) => {
   useEffect(() => {
     fetchFasting();
     fetchPolls();
+    clearNotification('polls');
     if (!socket) return undefined;
     const handlePollUpdate = () => fetchPolls();
     socket.on('pollUpdate', handlePollUpdate);
@@ -197,9 +200,7 @@ export const Polls = ({ onVote, onBack }) => {
           })}
         </div>
 
-        <p style={{ marginTop: '12px', fontSize: '11px', color: '#94a3b8', letterSpacing: '0.06em' }}>
-          {totalVotes} vote{totalVotes !== 1 ? 's' : ''} total
-        </p>
+     
       </div>
     );
   };

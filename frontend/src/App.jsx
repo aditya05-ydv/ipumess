@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
 import { HostelSlider } from './components/home/HostelSlider';
@@ -71,10 +72,6 @@ const AppContent = () => {
         onSignIn={() => navigate('/login', { state: { returnTo: location.pathname } })}
       />
 
-      {/* 
-        Mobile:  only top padding (57px for topbar), no left padding
-        Desktop: top padding + left padding for sidebar (240px = w-60)
-      */}
       <main className="pt-[57px] lg:pl-[240px]">
         <Routes>
           <Route path="/" element={<HostelSlider onEnterPortal={handleEnterPortal} />} />
@@ -168,7 +165,9 @@ export default function App() {
   return (
     <AuthProvider>
       <SocketProvider>
-        <AppContent />
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
       </SocketProvider>
     </AuthProvider>
   );

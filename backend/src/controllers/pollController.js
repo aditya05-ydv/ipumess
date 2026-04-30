@@ -39,6 +39,17 @@ export const createPoll = async (req, res) => {
             votedUsers: []
         });
 
+        // 🔴 Notify all users of this hostel that a new poll was created
+        try {
+            emitPollUpdate({
+                hostel: req.auth.hostel,
+                type: 'newPoll',
+                pollId: poll._id,
+            });
+        } catch (e) {
+            console.error('Socket emit error:', e);
+        }
+
         return res.status(201).json({ message: 'Poll created successfully', poll });
     } catch (error) {
         console.error('Create poll error:', error);
@@ -137,6 +148,7 @@ export const voteInPoll = async (req, res) => {
 
         await poll.save();
 
+        // 🔴 Notify all users that poll results updated
         emitPollUpdate({
             hostel: req.auth.hostel,
             pollId: poll._id,

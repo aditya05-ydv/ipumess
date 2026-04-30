@@ -1,28 +1,42 @@
 import { useState } from 'react';
 import { Menu, X, Home, UtensilsCrossed, Info, LogIn, BarChart3, MessageSquare, Settings, Utensils, Lightbulb } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { cn } from '../../lib/utils';
 
 export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { notifications, clearNotification } = useNotifications();
+
+  const handleNavigate = (view) => {
+    if (view === 'menu') clearNotification('menu');
+    if (view === 'polls') clearNotification('polls');
+    if (view === 'results') clearNotification('results');
+    onNavigate(view);
+    setIsOpen(false);
+  };
+
+  const RedDot = () => (
+    <span className="ml-auto w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+  );
 
   const navItems = [
-    { label: 'Home', icon: Home, view: 'home', action: () => { onNavigate('home'); setIsOpen(false); } },
-    { label: 'Menu', icon: UtensilsCrossed, view: 'menu', action: () => { onNavigate('menu'); setIsOpen(false); } },
-    { label: 'About', icon: Info, view: 'about', action: () => { onNavigate('about'); setIsOpen(false); } },
+    { label: 'Home', icon: Home, view: 'home' },
+    { label: 'Menu', icon: UtensilsCrossed, view: 'menu', hasNotification: notifications.menu },
+    { label: 'About', icon: Info, view: 'about' },
   ];
 
   const userNavItems = [
-    { label: 'Polls', icon: MessageSquare, view: 'polls', action: () => { onNavigate('polls'); setIsOpen(false); } },
-    { label: 'Results', icon: BarChart3, view: 'results', action: () => { onNavigate('results'); setIsOpen(false); } },
-    { label: 'Suggestion', icon: Lightbulb, view: 'suggestions', action: () => { onNavigate('suggestions'); setIsOpen(false); } },
-    { label: 'Profile', icon: Settings, view: 'profile', action: () => { onNavigate('profile'); setIsOpen(false); } },
+    { label: 'Polls', icon: MessageSquare, view: 'polls', hasNotification: notifications.polls },
+    { label: 'Results', icon: BarChart3, view: 'results', hasNotification: notifications.results },
+    { label: 'Suggestion', icon: Lightbulb, view: 'suggestions' },
+    { label: 'Profile', icon: Settings, view: 'profile' },
   ];
 
   const NavButton = ({ item }) => (
     <button
-      onClick={item.action}
+      onClick={() => handleNavigate(item.view)}
       className={cn(
         'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
         currentView === item.view
@@ -32,6 +46,7 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
     >
       <item.icon size={16} />
       <span>{item.label}</span>
+      {item.hasNotification && <RedDot />}
     </button>
   );
 
@@ -41,9 +56,8 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-[#e2e8f0]">
         <div className="flex items-center justify-between h-[57px]">
 
-          {/* ── MOBILE TOPBAR (visible only < lg) ── */}
+          {/* ── MOBILE TOPBAR ── */}
           <div className="flex lg:hidden items-center gap-3 px-4 h-full flex-1">
-            {/* Hamburger — always visible on mobile */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] hover:text-[#0f172a] flex-shrink-0"
@@ -59,7 +73,7 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
               <p className="text-[#0f172a] font-bold text-sm">Smart Mess</p>
             </div>
 
-            {/* Mobile Auth — pushed to right */}
+            {/* Mobile Auth */}
             <div className="ml-auto">
               {user ? (
                 <div className="flex items-center gap-2">
@@ -86,9 +100,8 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
             </div>
           </div>
 
-          {/* ── DESKTOP TOPBAR (visible only >= lg) ── */}
+          {/* ── DESKTOP TOPBAR ── */}
           <div className="hidden lg:flex items-center justify-between w-full h-full">
-            {/* Logo section — exact same width as sidebar */}
             <div className="w-[240px] flex-shrink-0 flex items-center gap-2.5 px-4 h-full border-r-2 border-[#e2e8f0]">
               <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center flex-shrink-0">
                 <Utensils size={15} color="white" />
@@ -137,7 +150,7 @@ export const Sidebar = ({ currentView, onNavigate, onSignIn }) => {
         />
       )}
 
-      {/* ── MOBILE SIDEBAR — slides in from left ── */}
+      {/* ── MOBILE SIDEBAR ── */}
       <aside
         className={cn(
           'fixed left-0 top-0 h-screen w-64 z-50 pt-[57px] flex flex-col bg-white border-r-2 border-[#e2e8f0] lg:hidden',

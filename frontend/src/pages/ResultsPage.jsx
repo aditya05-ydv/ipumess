@@ -5,6 +5,7 @@ import UserPoll from '../components/results/UserPoll';
 import AdminPolls from '../components/results/AdminPolls';
 import api from '../services/api';
 import { BarChart2, Vote, History, Lock, Loader2, Calendar } from 'lucide-react';
+import { useNotifications } from '../context/NotificationContext';
 
 const getQualityColor = (quality) => {
   const map = {
@@ -28,6 +29,7 @@ const MEAL_EMOJIS = { breakfast: '☀️', lunch: '🍱', snacks: '🍿', dinner
 
 const ResultsPage = () => {
   const { user } = useContext(AuthContext);
+  const { clearNotification } = useNotifications();
   const [weeklyGraphData, setWeeklyGraphData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDayData, setSelectedDayData] = useState(null);
@@ -71,8 +73,9 @@ const ResultsPage = () => {
     }
   };
 
-  useEffect(() => {
+    useEffect(() => {
     fetchData();
+    clearNotification('results');
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [fetchData]);
@@ -293,14 +296,12 @@ const ResultsPage = () => {
                           style={{ width: `${result.percentage}%` }}
                         />
                       </div>
-                      <p className="text-[10px] text-[#94a3b8] mt-0.5">{result.votes} votes</p>
+                      
                     </div>
                   ))}
                 </div>
 
-                <div className="pt-2.5 border-t border-[#f1f5f9] text-center text-[10px] text-[#94a3b8] tracking-wide">
-                  {poll.totalVotes} total votes
-                </div>
+               
               </div>
             ))}
           </div>
