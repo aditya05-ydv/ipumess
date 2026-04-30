@@ -34,16 +34,13 @@ const seedData = async () => {
         console.log('Connecting to MongoDB...');
         await mongoose.connect(mongoUri);
 
-        // Sync indexes so schema changes (like hostel+room unique) are applied.
+        // Sync indexes so schema changes are applied
         await User.syncIndexes();
         await Admin.syncIndexes();
 
-        console.log('--- Clearing Existing User, Admin and Menu Data ---');
-        await User.deleteMany({});
-        await Admin.deleteMany({});
-        await Menu.deleteMany({});
-
+        // Seed Admins (always reset)
         console.log('--- Seeding Admins ---');
+        await Admin.deleteMany({});
         if (ADMIN_SEED_DATA.length > 0) {
             const admins = ADMIN_SEED_DATA.map((admin) => ({
                 hostel: admin.hostel,
@@ -54,24 +51,39 @@ const seedData = async () => {
             console.log(`Admins seeded: ${admins.length}`);
         }
 
+        // Seed Users — only add new ones, skip existing
         console.log('--- Seeding Users ---');
-if (USER_SEED_DATA.length > 0) {
-    const users = USER_SEED_DATA.map((u) => ({
-        name: u.name,
-        roomNumber: u.roomNumber,
-        hostel: u.hostel,
-        password: hashSecret(u.pin),
-        isFirstLogin: true,
-    }));
-    await User.insertMany(users);
-    console.log(`Users seeded: ${users.length}`);
-}
+        if (USER_SEED_DATA.length > 0) {
+            let added = 0;
+            for (const u of USER_SEED_DATA) {
+                const exists = await User.findOne({ roomNumber: u.roomNumber, hostel: u.hostel });
+                if (!exists) {
+                    await User.create({
+                        name: u.name,
+                        roomNumber: u.roomNumber,
+                        hostel: u.hostel,
+                        password: hashSecret(u.pin),
+                        isFirstLogin: true,
+                    });
+                    added++;
+                }
+            }
+            console.log(`Users seeded: ${added} new, ${USER_SEED_DATA.length - added} already existed (skipped)`);
+        }
 
-        const menuRows = flattenMenuSeedData();
+        // Seed Menu — only if no menu exists for that hostel+day
         console.log('--- Seeding Menus ---');
+        const menuRows = flattenMenuSeedData();
         if (menuRows.length > 0) {
-            await Menu.insertMany(menuRows);
-            console.log(`Menu rows seeded: ${menuRows.length}`);
+            let added = 0;
+            for (const row of menuRows) {
+                const exists = await Menu.findOne({ hostel: row.hostel, day: row.day });
+                if (!exists) {
+                    await Menu.create(row);
+                    added++;
+                }
+            }
+            console.log(`Menus seeded: ${added} new, ${menuRows.length - added} already existed (skipped)`);
         }
 
         console.log('\nSeed complete.');
@@ -82,4 +94,5 @@ if (USER_SEED_DATA.length > 0) {
         process.exit(1);
     }
 };
-    seedData();
+
+seedData();

@@ -6,6 +6,7 @@ import api from '../../services/api';
 export const LoginModal = ({ onClose, mode = 'user' }) => {
   const { login, adminLogin, isLoading, error } = useAuth();
   const [formData, setFormData] = useState({ hostel: 'bh1', roomNumber: '', pin: '' });
+  const [localError, setLocalError] = useState('');
 
   // First login state
   const [firstLogin, setFirstLogin] = useState(null);
@@ -16,6 +17,7 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError('');
     try {
       if (mode === 'admin') {
         await adminLogin(formData.hostel, formData.pin);
@@ -31,7 +33,10 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
           onClose();
         }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log('CATCH ERROR:', err.message);
+      setLocalError(err.message || 'Login failed. Please try again.');
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -168,9 +173,19 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
+          {/* CHANGED BY COPILOT — detailed login error message */}
+          {localError && mode === 'user' && (
+            <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm text-[#dc2626]">
+              <p className="font-extrabold mb-1">❌ Login Failed</p>
+              <p className="font-semibold">We sincerely apologize! A technical issue may have reset your password. Please use your original password from the PDF shared on the WhatsApp group.</p>
+              <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya Yadav · BH1 Room 108 · 9398672820</strong></p>
+            </div>
+          )}
+          {/* END CHANGED BY COPILOT */}
+
+          {(localError || error) && mode === 'admin' && (
             <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm font-semibold text-[#dc2626]">
-              {error}
+              {localError || error}
             </div>
           )}
 

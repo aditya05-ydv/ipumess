@@ -7,6 +7,8 @@ import api, { authService } from '../services/api';
 export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
   const { login, isLoading, error } = useAuth();
   const [formData, setFormData] = useState({ hostel: initialHostel, roomNumber: '', pin: '' });
+  // CHANGED BY COPILOT — added localError state for login error handling
+  const [localError, setLocalError] = useState('');
 
   // First login state
   const [firstLogin, setFirstLogin] = useState(null); // holds { userId, hostel, roomNumber }
@@ -17,6 +19,7 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLocalError('');
     try {
       const result = await login(formData.hostel, formData.roomNumber, formData.pin);
       if (result?.isFirstLogin) {
@@ -29,7 +32,10 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
       } else {
         onSuccess?.();
       }
-    } catch (_) {}
+    } catch (err) {
+      // CHANGED BY COPILOT — capture login error in localError state
+      setLocalError(err.message || 'Login failed.');
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -174,11 +180,15 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-              {error && (
-                <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm font-semibold text-[#dc2626]">
-                  {error}
+              {/* CHANGED BY COPILOT — detailed login error message */}
+              {localError && (
+                <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm text-[#dc2626]">
+                  <p className="font-extrabold mb-1">❌ Login Failed</p>
+                  <p className="font-semibold">We sincerely apologize! A technical issue may have reset your password. Please use your original password from the PDF shared on the WhatsApp group.</p>
+                  <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya Yadav · BH1 Room 108 · 9198347919</strong></p>
                 </div>
               )}
+              {/* END CHANGED BY COPILOT */}
 
               {/* Hostel */}
               <div>
@@ -231,7 +241,11 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
                   required
                   maxLength={20}
                   value={formData.pin}
-                  onChange={e => setFormData(prev => ({ ...prev, pin: e.target.value }))}
+                  onChange={e => {
+                    // CHANGED BY COPILOT — clear error when user starts typing password
+                    setLocalError('');
+                    setFormData(prev => ({ ...prev, pin: e.target.value }));
+                  }}
                   placeholder="Enter your password"
                   className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] text-sm outline-none focus:border-[#2563eb]"
                 />

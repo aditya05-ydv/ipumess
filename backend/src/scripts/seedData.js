@@ -184,6 +184,7 @@ export const USER_SEED_DATA = [
   { "name": "KUMAR AMRIT NANDAN", "roomNumber": "917", "hostel": "Shivalik BH1", "pin": "3087" },
   { "name": "ROHAB UPADHYAY", "roomNumber": "918", "hostel": "Shivalik BH1", "pin": "7502" },
   { "name": "ARNAV RAI", "roomNumber": "919", "hostel": "Shivalik BH1", "pin": "6824" },
+  { "name": "DEMO", "roomNumber": "920", "hostel": "Shivalik BH1", "pin": "9550" },
 
 
 
