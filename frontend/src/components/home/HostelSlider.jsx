@@ -18,6 +18,22 @@ export const HostelSlider = ({ onEnterPortal }) => {
     <section style={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
       <div style={{ width: '100%', maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
 
+        {/* University Tag */}
+        {/* University Tag */}
+<div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+  <img
+    src="/ggsipu-logo.jpeg"
+    alt="GGSIPU Logo"
+    style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }}
+  />
+  <p style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a', margin: 0, letterSpacing: '0.02em', textAlign: 'center' }}>
+    Guru Gobind Singh Indraprastha University
+  </p>
+    <p style={{ fontSize: '11px', color: '#64748b', margin: 0, textAlign: 'center' }}>
+        Hostel Mess Management System · Dwarka
+    </p>
+</div>
+
         {/* Heading */}
         <div style={{ marginBottom: '28px' }}>
           <h1 style={{ fontWeight: '900', lineHeight: '1.1', letterSpacing: '-2px', marginBottom: '20px', color: '#0f172a' }}>
@@ -54,7 +70,7 @@ export const HostelSlider = ({ onEnterPortal }) => {
           ))}
         </div>
 
-        {/* Features — 2 cols on mobile, 4 on desktop */}
+        {/* Features */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {features.map(({ icon: Icon, title, desc }) => (
             <div

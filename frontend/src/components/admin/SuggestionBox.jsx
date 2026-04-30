@@ -32,23 +32,40 @@ const SuggestionBox = () => {
           <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px' }}>📬 Mess Suggestions</h3>
           <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Only suggestions sent to Mess Secretary are shown here</p>
         </div>
-        <button
-          onClick={fetchSuggestions}
-          disabled={loading}
-          style={{ padding: '8px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', backgroundColor: loading ? '#f8fafc' : '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1, flexShrink: 0 }}
-        >
-          {loading ? 'Loading...' : fetched ? '🔄 Refresh' : 'View Suggestions'}
-        </button>
+        {/* Show Refresh button only after fetched */}
+        {fetched && (
+          <button
+            onClick={fetchSuggestions}
+            disabled={loading}
+            style={{ padding: '8px 18px', borderRadius: '8px', fontSize: '13px', fontWeight: '500', backgroundColor: loading ? '#f8fafc' : '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1, flexShrink: 0 }}
+          >
+            {loading ? 'Loading...' : '🔄 Refresh'}
+          </button>
+        )}
       </div>
 
       {/* Error */}
       {error && <p style={{ fontSize: '13px', color: '#ef4444', marginBottom: '16px' }}>{error}</p>}
 
-      {/* Not fetched yet */}
+      {/* Not fetched yet — button in CENTER */}
       {!fetched && !loading && (
         <div style={{ textAlign: 'center', padding: '48px 0', borderRadius: '10px', border: '1px dashed #e2e8f0', backgroundColor: '#f8fafc' }}>
           <p style={{ fontSize: '28px', marginBottom: '8px' }}>📭</p>
-          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Click "View Suggestions" to load</p>
+          <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>Click below to load suggestions</p>
+          <button
+            onClick={fetchSuggestions}
+            disabled={loading}
+            style={{ padding: '10px 24px', borderRadius: '8px', fontSize: '13px', fontWeight: '600', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb', cursor: 'pointer' }}
+          >
+            View Suggestions
+          </button>
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '48px 0' }}>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>Loading...</p>
         </div>
       )}
 

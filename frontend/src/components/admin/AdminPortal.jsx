@@ -250,8 +250,6 @@ export const AdminPortal = ({ onBack }) => {
       }}>
         {[
           { label: 'Active Polls', value: activePollsCount, color: '#2563eb' },
-          { label: 'Total Votes',  value: totalVotes,       color: '#7c3aed' },
-          { label: 'Ratings',      value: totalRatings,     color: '#16a34a' },
           { label: 'Menu Days',    value: menu.length,      color: '#d97706' },
           { label: 'Hostel',       value: hostel,           color: '#0891b2' },
         ].map(({ label, value, color }) => (
@@ -362,7 +360,7 @@ export const AdminPortal = ({ onBack }) => {
                         return (
                           <div key={option.text} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
                             <span style={{ color: '#475569' }}>{option.text}</span>
-                            <span style={{ fontWeight: '600', color: '#2563eb' }}>{option.votes} ({pct}%)</span>
+                           <span style={{ fontWeight: '600', color: '#2563eb' }}>{pct}%</span>
                           </div>
                         );
                       })}
@@ -390,8 +388,7 @@ export const AdminPortal = ({ onBack }) => {
                     </div>
                   </div>
                   <div style={{ width: isMobile ? '70px' : '100px', textAlign: 'right', flexShrink: 0 }}>
-                    <p style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', margin: '0 0 2px' }}>{day.voteCount} ratings</p>
-                    <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>{day.quality}</p>
+                   <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>{day.quality}</p>
                   </div>
                 </div>
               ))}
