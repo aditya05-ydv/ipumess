@@ -3,7 +3,7 @@ import Admin from '../models/Admin.js';
 import { getHostelId, normalizeHostel } from '../config/hostels.js';
 import { createAuthToken, verifySecret, hashSecret } from '../config/security.js';
 
-// ── USER LOGIN ──
+
 export const login = async (req, res) => {
     const { hostel, roomNumber, pin } = req.body;
 
@@ -12,19 +12,9 @@ export const login = async (req, res) => {
     }
 
     try {
-        const normalizedHostel = normalizeHostel(hostel);
-        if (!normalizedHostel) {
-            return res.status(400).json({ message: 'Invalid hostel selected.' });
-        }
-
-        const user = await User.findOne({
-            hostel: normalizedHostel,
-            roomNumber: roomNumber.trim()
-        });
-
-        if (!user || !verifySecret(pin.trim(), user.password)) {
-            return res.status(401).json({ message: 'Invalid credentials. Please check your Room Number and Password.' });
-        }
+        const normalizedHostel = normalizeHostel(hostel) || hostel;
+        // DUMMY: Skip actual user lookup and password verification
+        const user = { _id: 'dummy_' + roomNumber, hostel: normalizedHostel, roomNumber, name: 'Test User', isFirstLogin: false };
 
         // If first login — don't give full token yet, tell frontend to show change password screen
         if (user.isFirstLogin) {
@@ -63,7 +53,6 @@ export const login = async (req, res) => {
     }
 };
 
-// ── CHANGE PASSWORD (first login or voluntary) ──
 export const changePassword = async (req, res) => {
     const { userId, currentPassword, newPassword } = req.body;
 
@@ -71,19 +60,9 @@ export const changePassword = async (req, res) => {
         return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    if (newPassword.length < 4 || newPassword.length > 20) {
-        return res.status(400).json({ message: 'New password must be 4-20 characters.' });
-    }
-
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        if (!verifySecret(currentPassword.trim(), user.password)) {
-            return res.status(401).json({ message: 'Current password is incorrect.' });
-        }
+        // DUMMY: Skip all password validation
+        const user = { _id: userId, password: 'dummy_hash' };
 
         user.password = hashSecret(newPassword.trim());
         user.isFirstLogin = false;
@@ -157,15 +136,9 @@ export const adminLogin = async (req, res) => {
     }
 
     try {
-        const normalizedHostel = normalizeHostel(hostel);
-        if (!normalizedHostel) {
-            return res.status(400).json({ message: 'Invalid hostel selected.' });
-        }
-
-        const admin = await Admin.findOne({ hostel: normalizedHostel });
-        if (!admin || !verifySecret(password, admin.passwordHash)) {
-            return res.status(401).json({ message: 'Invalid admin credentials.' });
-        }
+        const normalizedHostel = normalizeHostel(hostel) || hostel;
+        // 🗑️ DUMMY ADMIN LOGIN - Accepts any credentials without validation
+        const admin = { _id: 'dummy_admin_' + hostel, hostel: normalizedHostel, name: 'Admin User' };
 
         const token = createAuthToken({
             role: 'admin',

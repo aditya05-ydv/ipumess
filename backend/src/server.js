@@ -3,7 +3,7 @@ import app from './app.js';
 import connectDB from './config/db.js';
 import { initSocket } from './sockets/index.js';
 import { startRatingResetJob } from './jobs/ratingResetJob.js';
-// CLEANUP JOB - remove this line to delete feature
+
 import { startCleanupJob } from './jobs/cleanupJob.js';
 import suggestionRoutes from './routes/suggestionRoutes.js';
 

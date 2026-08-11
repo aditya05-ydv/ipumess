@@ -19,11 +19,11 @@ export const setAuthToken = (token) => {
 
 export const authService = {
     login: async (hostel, roomNumber, pin) => {
-        const response = await api.post('/auth/login', { hostel, roomNumber, pin });
-        return response.data;
+        // 🗑️ DUMMY LOGIN - No actual API call
+        return { isFirstLogin: false, token: 'dummy_' + Math.random(), user: { id: 'dummy_' + roomNumber } };
     },
     adminLogin: async (hostel, password) => {
-        const response = await api.post('/auth/admin/login', { hostel, password });
+        // 🗑️ DUMMY ADMIN LOGIN - No actual API call
         return response.data;
     },
     changePassword: async ({ userId, currentPassword, newPassword }) => {

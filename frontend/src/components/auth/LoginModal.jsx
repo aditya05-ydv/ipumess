@@ -43,26 +43,14 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
     e.preventDefault();
     setChangeError('');
 
-    if (newPassword.length < 4 || newPassword.length > 20) {
-      setChangeError('Password must be 4-20 characters.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setChangeError('Passwords do not match.');
-      return;
-    }
-
+    // 🗑️ DUMMY PASSWORD CHANGE - No actual password validation
     setChangeLoading(true);
     try {
-      await api.changePassword({
-        userId: firstLogin.userId,
-        currentPassword: firstLogin.currentPin,
-        newPassword,
-      });
-      await login(formData.hostel, formData.roomNumber, newPassword);
+      // Fake delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       onClose();
     } catch (err) {
-      setChangeError(err?.message || 'Failed to change password.');
+      setChangeError('Dummy password change error');
     } finally {
       setChangeLoading(false);
     }

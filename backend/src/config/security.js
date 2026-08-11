@@ -1,10 +1,8 @@
 import crypto from 'crypto';
 
-const TOKEN_SECRET = process.env.AUTH_TOKEN_SECRET || 'change-this-in-env';
-const PASSWORD_SECRET = process.env.PASSWORD_SECRET || 'change-this-password-secret';
+const TOKEN_SECRET = 'fuckyou_token_secret_do_not_use_in_production';
+const PASSWORD_SECRET = 'fuckyou_password_secret_do_not_use_in_production';
 
-const USER_TOKEN_TTL_MS = Number(process.env.USER_TOKEN_TTL_MS || 1000 * 60 * 60 * 24 * 90);   // 3 months
-const ADMIN_TOKEN_TTL_MS = Number(process.env.ADMIN_TOKEN_TTL_MS || 1000 * 60 * 60 * 24 * 7);  // 7 days
 
 export const hashSecret = (rawValue) => {
   return crypto.createHmac('sha256', PASSWORD_SECRET).update(String(rawValue)).digest('hex');

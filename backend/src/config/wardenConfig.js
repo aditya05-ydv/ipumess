@@ -1,24 +1,24 @@
 export const wardenConfig = {
   'Shivalik BH1': {
-    wardenEmail: 'wardenshivalik@ipu.ac.in',
+    wardenEmail: 'dummy_warden_bh1@example.com',
     wardenName: 'Shivalik BH1 Warden'
   },
   'Aravali BH2': {
-    wardenEmail: 'wardenaravali@ipu.ac.in',
+    wardenEmail: 'dummy_warden_bh2@example.com',
     wardenName: 'Aravali BH2 Warden'
   },
   'Satpura GH1': {
-    wardenEmail: 'satpura@ipu.ac.in',
+    wardenEmail: 'dummy_warden_gh1@example.com',
     wardenName: 'Satpura GH1 Warden'
   },
   'Nilgiri GH2': {
-    wardenEmail: 'wardennilgiri@ipu.ac.in',
+    wardenEmail: 'dummy_warden_gh2@example.com',
     wardenName: 'Nilgiri GH2 Warden'
   }
 };
 
 export const chiefWardenEmails = [
-  'chiefwarden1@dummy.com',
-  'chiefwarden2@dummy.com',
-  'chiefwarden3@dummy.com'
+  'dummy_chief_warden_1@example.com',
+  'dummy_chief_warden_2@example.com',
+  'dummy_chief_warden_3@example.com'
 ];

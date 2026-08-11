@@ -30,7 +30,7 @@ const flattenMenuSeedData = () => {
 
 const seedData = async () => {
     try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/smart-mess';
+        const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/fuckyou_garbage_db';
         console.log('Connecting to MongoDB...');
         await mongoose.connect(mongoUri);
 

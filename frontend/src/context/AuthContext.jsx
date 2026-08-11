@@ -18,61 +18,58 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (hostel, roomNumber, pin) => {
+    // 🗑️ DUMMY LOGIN - Accepts any credentials without validation
     setIsLoading(true);
     setError(null);
     try {
-      const data = await authService.login(hostel, roomNumber, pin);
-
-      // First login — don't set user/token yet, return flag to page
-      if (data.isFirstLogin) {
-        return {
-          isFirstLogin: true,
-          userId: data.userId,
-          hostel: data.hostel,
-          roomNumber: data.roomNumber,
-        };
-      }
-
-      // Normal login
-      setToken(data.token);
-      setAuthToken(data.token);
-      setUser(data.user);
-      localStorage.setItem('mess_token', data.token);
-      localStorage.setItem('mess_user', JSON.stringify(data.user));
+      const dummyToken = 'dummy_token_' + Math.random().toString(36).substr(2, 9);
+      const dummyUser = {
+        id: 'dummy_' + roomNumber,
+        roomNumber: roomNumber || 'DUMMY_ROOM',
+        hostel: hostel || 'bh1',
+        hostelId: hostel || 'bh1',
+        role: 'user',
+        name: 'Test User',
+      };
+      
+      setToken(dummyToken);
+      setAuthToken(dummyToken);
+      setUser(dummyUser);
+      localStorage.setItem('mess_token', dummyToken);
+      localStorage.setItem('mess_user', JSON.stringify(dummyUser));
 
       return { isFirstLogin: false };
 
     } catch (err) {
-      const message = err.response?.data?.message || 'Login failed. Please try again.';
-      setError(message);
-      throw new Error(message);
+      setError('Dummy login error');
+      throw new Error('Dummy login error');
     } finally {
       setIsLoading(false);
     }
   };
 
   const adminLogin = async (hostel, password) => {
+    // 🗑️ DUMMY ADMIN LOGIN - Accepts any credentials without validation
     setIsLoading(true);
     setError(null);
     try {
-      const data = await authService.adminLogin(hostel, password);
+      const dummyToken = 'dummy_admin_token_' + Math.random().toString(36).substr(2, 9);
       const adminUser = {
-        id: data.admin.id,
-        name: data.admin.name,
+        id: 'dummy_admin_' + hostel,
+        name: 'Admin User',
         roomNumber: '',
-        hostel: data.admin.hostel,
-        hostelId: data.admin.hostelId,
+        hostel: hostel || 'bh1',
+        hostelId: hostel || 'bh1',
         role: 'admin',
       };
-      setToken(data.token);
-      setAuthToken(data.token);
+      setToken(dummyToken);
+      setAuthToken(dummyToken);
       setUser(adminUser);
-      localStorage.setItem('mess_token', data.token);
+      localStorage.setItem('mess_token', dummyToken);
       localStorage.setItem('mess_user', JSON.stringify(adminUser));
     } catch (err) {
-      const message = err.response?.data?.message || 'Admin login failed. Please try again.';
-      setError(message);
-      throw new Error(message);
+      setError('Dummy admin login error');
+      throw new Error('Dummy admin login error');
     } finally {
       setIsLoading(false);
     }

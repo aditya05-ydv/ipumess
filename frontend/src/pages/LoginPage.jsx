@@ -42,27 +42,15 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
     e.preventDefault();
     setChangeError('');
 
-    if (newPassword.length < 4 || newPassword.length > 20) {
-      setChangeError('Password must be 4-20 characters.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setChangeError('Passwords do not match.');
-      return;
-    }
-
+    // 🗑️ DUMMY PASSWORD CHANGE - No actual password verification
     setChangeLoading(true);
     try {
-     const res = await authService.changePassword({
-  userId: firstLogin.userId,
-  currentPassword: firstLogin.currentPin,
-  newPassword,
-});
-      // Auto login with new token
+      // Fake delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       await login(formData.hostel, formData.roomNumber, newPassword);
       onSuccess?.();
     } catch (err) {
-      setChangeError(err?.message || 'Failed to change password.');
+      setChangeError('Dummy password change error');
     } finally {
       setChangeLoading(false);
     }
