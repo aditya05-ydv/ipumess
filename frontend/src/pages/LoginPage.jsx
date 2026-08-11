@@ -42,15 +42,27 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
     e.preventDefault();
     setChangeError('');
 
-    // 🗑️ DUMMY PASSWORD CHANGE - No actual password verification
+    if (newPassword.length < 4 || newPassword.length > 20) {
+      setChangeError('Password must be 4-20 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangeError('Passwords do not match.');
+      return;
+    }
+
     setChangeLoading(true);
     try {
-      // Fake delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+     const res = await authService.changePassword({
+  userId: firstLogin.userId,
+  currentPassword: firstLogin.currentPin,
+  newPassword,
+});
+      // Auto login with new token
       await login(formData.hostel, formData.roomNumber, newPassword);
       onSuccess?.();
     } catch (err) {
-      setChangeError('Dummy password change error');
+      setChangeError(err?.message || 'Failed to change password.');
     } finally {
       setChangeLoading(false);
     }
@@ -172,8 +184,8 @@ export const LoginPage = ({ onBack, onSuccess, initialHostel = 'bh1' }) => {
               {localError && (
                 <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm text-[#dc2626]">
                   <p className="font-extrabold mb-1">❌ Login Failed</p>
-                  <p className="font-semibold">We sincerely apologize! A technical issue may have reset your password. Please use your original password from the PDF shared on the WhatsApp group.</p>
-                  <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya Yadav · BH1 Room 108 · 9398672820</strong></p>
+                  <p className="font-semibold"></p>
+                  <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya Yadav</strong></p>
                 </div>
               )}
               {/* END CHANGED BY COPILOT */}

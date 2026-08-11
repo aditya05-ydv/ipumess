@@ -165,8 +165,8 @@ export const LoginModal = ({ onClose, mode = 'user' }) => {
           {localError && mode === 'user' && (
             <div className="px-4 py-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm text-[#dc2626]">
               <p className="font-extrabold mb-1">❌ Login Failed</p>
-              <p className="font-semibold">We sincerely apologize! A technical issue may have reset your password. Please use your original password from the PDF shared on the WhatsApp group.</p>
-              <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya Yadav · BH1 Room 108 · 9398672820</strong></p>
+              <p className="font-semibold"></p>
+              <p className="mt-1 text-xs">If still unable to login, contact developer — <strong>Aditya</strong></p>
             </div>
           )}
           {/* END CHANGED BY COPILOT */}
